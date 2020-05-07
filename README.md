@@ -20,7 +20,7 @@ allprojects {
 }
 
 dependencies {
-  implementation 'com.github.lincollincol:GetMe:Tag'
+  implementation 'com.github.lincollincol:GetMe:1.0'
 }
 
   ```
@@ -36,7 +36,7 @@ dependencies {
 <dependency>
   <groupId>com.github.lincollincol</groupId>
   <artifactId>GetMe</artifactId>
-  <version>Tag</version>
+  <version>1.0</version>
 </dependency>
 ```
 
