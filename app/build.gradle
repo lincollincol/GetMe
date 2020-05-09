@@ -34,6 +34,9 @@ android {
 }
 
 dependencies {
+
+    implementation project(":getme")
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -43,6 +46,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    // Permission
+    implementation 'com.karumi:dexter:6.0.2'
+
     // ReactiveX
     def rx_version = "3.0.0"
     implementation "io.reactivex.rxjava3:rxandroid:$rx_version"
@@ -50,5 +56,7 @@ dependencies {
 
     // Design
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+//    implementation 'com.github.lincollincol:GetMe:1.0'
 
 }

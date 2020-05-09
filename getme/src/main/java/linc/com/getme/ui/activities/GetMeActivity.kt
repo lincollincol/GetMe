@@ -1,10 +1,10 @@
-package linc.com.getme.ui
+package linc.com.getme.ui.activities
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_get_me.*
+import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemEntity
@@ -38,7 +38,7 @@ class GetMeActivity :
             setFilesystemEntityClickListener(this@GetMeActivity)
         }
 
-        filesystemEntities.apply {
+        val filesystemEntities = findViewById<RecyclerView>(R.id.filesystemEntities).apply {
             layoutManager = LinearLayoutManager(this@GetMeActivity)
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
