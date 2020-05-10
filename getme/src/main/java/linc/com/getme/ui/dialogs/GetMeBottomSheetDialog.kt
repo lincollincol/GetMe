@@ -1,13 +1,19 @@
-package linc.com.getme.ui.fragments
+package linc.com.getme.ui.dialogs
 
+import android.app.Dialog
+import android.content.pm.ActivityInfo
+import android.graphics.Point
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import linc.com.getme.R
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemEntity
@@ -17,23 +23,18 @@ import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.StateManager
 
-class GetMeFragment : Fragment(),
+
+@Deprecated(message = "This function will be available in the future")
+class GetMeBottomSheetDialog : BottomSheetDialogFragment(),
     FilesystemView,
-    FilesystemBackListener,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
 
-    private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
-    private lateinit var closeFileManagerCallback: CloseFileManagerCallback
     private var presenter: FilesystemPresenter? = null
+    private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
 
     companion object {
-        fun <T : CloseFileManagerCallback> newInstance(
-            closeFileManagerCallback: CloseFileManagerCallback,
-            parentComponent: T
-        ) = GetMeFragment().apply {
-            this.closeFileManagerCallback = closeFileManagerCallback
-            parentComponent.filesystemBackListener = this
-        }
+        @Deprecated(message = "This function will be available in the future", level = DeprecationLevel.HIDDEN)
+        fun newInstance() = GetMeBottomSheetDialog()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,20 +53,24 @@ class GetMeFragment : Fragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_get_me, container, false)
+    ): View? = inflater.inflate(R.layout.dialog_bottom_sheet_get_me, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        (requireDialog() as BottomSheetDialog).behavior.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+
         filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {
-            setFilesystemEntityClickListener(this@GetMeFragment)
+            setFilesystemEntityClickListener(this@GetMeBottomSheetDialog)
         }
 
-        val filesystemEntities = view.findViewById<RecyclerView>(R.id.filesystemEntities).apply {
+        view.findViewById<RecyclerView>(R.id.filesystemEntities).apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
+
     }
 
     override fun showFilesystemEntities(filesystemEntities: List<FilesystemEntity>) {
@@ -77,7 +82,7 @@ class GetMeFragment : Fragment(),
     }
 
     override fun closeManager() {
-        closeFileManagerCallback.onCloseFileManager()
+        dismiss()
     }
 
     override fun onClick(filesystemEntity: FilesystemEntity) {
@@ -93,10 +98,6 @@ class GetMeFragment : Fragment(),
     override fun onStop() {
         super.onStop()
         presenter?.unbind()
-    }
-
-    override fun backPressedInFileManager() {
-        presenter?.openPreviousFilesystemEntity()
     }
 
 }

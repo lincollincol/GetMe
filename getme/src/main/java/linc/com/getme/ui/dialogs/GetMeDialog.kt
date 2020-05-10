@@ -1,11 +1,12 @@
-package linc.com.getme.ui.fragments
+package linc.com.getme.ui.dialogs
 
+import android.app.Dialog
+import android.graphics.Point
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
@@ -13,27 +14,21 @@ import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
+import linc.com.getme.ui.fragments.FilesystemBackListener
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.StateManager
 
-class GetMeFragment : Fragment(),
+
+class GetMeDialog : DialogFragment(),
     FilesystemView,
-    FilesystemBackListener,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
 
-    private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
-    private lateinit var closeFileManagerCallback: CloseFileManagerCallback
     private var presenter: FilesystemPresenter? = null
+    private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
 
     companion object {
-        fun <T : CloseFileManagerCallback> newInstance(
-            closeFileManagerCallback: CloseFileManagerCallback,
-            parentComponent: T
-        ) = GetMeFragment().apply {
-            this.closeFileManagerCallback = closeFileManagerCallback
-            parentComponent.filesystemBackListener = this
-        }
+        fun newInstance() = GetMeDialog()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,19 +47,32 @@ class GetMeFragment : Fragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_get_me, container, false)
+    ): View? = inflater.inflate(R.layout.dialog_get_me, container, false)
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        isCancelable = false
+
         filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {
-            setFilesystemEntityClickListener(this@GetMeFragment)
+            setFilesystemEntityClickListener(this@GetMeDialog)
         }
 
-        val filesystemEntities = view.findViewById<RecyclerView>(R.id.filesystemEntities).apply {
+        view.findViewById<RecyclerView>(R.id.filesystemEntities).apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
+        }
+
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return object : Dialog(super.onCreateDialog(savedInstanceState).context) {
+            override fun onBackPressed() {
+                presenter?.openPreviousFilesystemEntity()
+
+            }
         }
     }
 
@@ -77,7 +85,7 @@ class GetMeFragment : Fragment(),
     }
 
     override fun closeManager() {
-        closeFileManagerCallback.onCloseFileManager()
+        dismiss()
     }
 
     override fun onClick(filesystemEntity: FilesystemEntity) {
@@ -86,17 +94,32 @@ class GetMeFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
+
+        val window: Window? = dialog!!.window
+        val size = Point()
+
+        val display: Display = window!!.windowManager!!.defaultDisplay
+        display.getSize(size)
+
+        val width: Int = size.x
+        val height: Int = size.y
+
+        window.setBackgroundDrawable(ContextCompat.getDrawable(
+            window.context,
+            R.drawable.background_dialog_rounded_corners
+        ))
+
+        window.setLayout((width * 0.8).toInt(), (height * 0.6).toInt())
+        window.setGravity(Gravity.CENTER)
+
         presenter?.bind(this)
         presenter?.getFilesystemEntities()
+
     }
 
     override fun onStop() {
         super.onStop()
         presenter?.unbind()
-    }
-
-    override fun backPressedInFileManager() {
-        presenter?.openPreviousFilesystemEntity()
     }
 
 }

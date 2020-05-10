@@ -11,10 +11,60 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
 import linc.com.getme.ui.activities.GetMeActivity
-import linc.com.getme.ui.fragments.CloseFileManagerCallback
-import linc.com.getme.ui.fragments.FilesystemBackListener
-import linc.com.getme.ui.fragments.GetMeFragment
+import linc.com.getme.ui.dialogs.GetMeBottomSheetDialog
+import linc.com.getme.ui.dialogs.GetMeDialog
 
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        Dexter.withActivity(this)
+            .withPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ).withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport) {}
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: List<PermissionRequest?>?,
+                    token: PermissionToken?
+                ) {}
+            }).check()
+
+
+    }
+}
+
+/** Dialog fragment*/
+/*class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        Dexter.withActivity(this)
+            .withPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ).withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport) {}
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: List<PermissionRequest?>?,
+                    token: PermissionToken?
+                ) {}
+            }).check()
+
+        openFileManager.setOnClickListener {
+            GetMeDialog.newInstance()
+                .show(supportFragmentManager, "GET_ME")
+        }
+    }
+
+}*/
+
+/** Fragment */
+/*
 class MainActivity : AppCompatActivity(), CloseFileManagerCallback {
 
     override lateinit var filesystemBackListener: FilesystemBackListener
@@ -35,19 +85,14 @@ class MainActivity : AppCompatActivity(), CloseFileManagerCallback {
                 ) {}
             }).check()
 
-        // Activity
-//        openFileManager.setOnClickListener {
-//            startActivity(Intent(this, GetMeActivity::class.java))
-//        }
-
+        // Fragment
         openFileManager.setOnClickListener {
             supportFragmentManager.beginTransaction()
                 .replace(
                     R.id.fragmentContainer,
-                    GetMeFragment.newInstance(this@MainActivity, this)
+                    GetMeFragment.newInstance(this, this)
                 ).commit()
         }
-
     }
 
     override fun onCloseFileManager() {
@@ -55,7 +100,35 @@ class MainActivity : AppCompatActivity(), CloseFileManagerCallback {
     }
 
     override fun onBackPressed() {
-        filesystemBackListener.subscribe()
+        filesystemBackListener.backPressedInFileManager()
     }
 
-}
+}*/
+
+/** Activity */
+/*
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        Dexter.withActivity(this)
+            .withPermissions(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ).withListener(object : MultiplePermissionsListener {
+                override fun onPermissionsChecked(report: MultiplePermissionsReport) {}
+                override fun onPermissionRationaleShouldBeShown(
+                    permissions: List<PermissionRequest?>?,
+                    token: PermissionToken?
+                ) {}
+            }).check()
+
+        // Activity
+        openFileManager.setOnClickListener {
+            startActivity(Intent(this, GetMeActivity::class.java))
+        }
+
+    }
+}*/

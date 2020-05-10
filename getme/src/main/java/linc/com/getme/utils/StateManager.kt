@@ -9,8 +9,7 @@ class StateManager {
     }
 
     fun goTo(path: String) {
-
-        println("STACK ================== ${currentPathState.push(path)}")
+        currentPathState.push(path)
     }
 
     fun goBack() {
