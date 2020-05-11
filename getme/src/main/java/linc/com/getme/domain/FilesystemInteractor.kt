@@ -6,7 +6,8 @@ import linc.com.getme.device.StorageHelper
 import java.io.File
 
 class FilesystemInteractor(
-    private val storageHelper: StorageHelper
+    private val storageHelper: StorageHelper,
+    private val getMeSettings: GetMeSettings
 ) {
 
     fun getRoot(): Single<List<FilesystemEntity>> {
@@ -14,7 +15,7 @@ class FilesystemInteractor(
             val filesystemEntities = mutableListOf<FilesystemEntity>()
 
             // storage/emulated/0
-            filesystemEntities.add(FilesystemEntity.newInstance(
+            filesystemEntities.add(FilesystemEntity.fromPath(
                 storageHelper.getExternalStoragePath(false)!!
             ))
 
@@ -22,7 +23,7 @@ class FilesystemInteractor(
             val sdCard = storageHelper.getExternalStoragePath(true)
 
             if(sdCard != null) {
-                filesystemEntities.add(FilesystemEntity.newInstance(sdCard))
+                filesystemEntities.add(FilesystemEntity.fromPath(sdCard))
             }
 
             it.onSuccess(filesystemEntities)
@@ -36,16 +37,47 @@ class FilesystemInteractor(
     }
 
     private fun openDirectory(directory: File): List<FilesystemEntity> {
-        val filesystemEntities = mutableListOf<FilesystemEntity>()
+        val filesystemEntities = hashSetOf<FilesystemEntity>()
+
 
         for (fileEntry in directory.listFiles()) {
-            filesystemEntities.add(FilesystemEntity(
-                fileEntry.path,
-                fileEntry.name,
-                fileEntry.extension
-            ))
+            if(getMeSettings.actionType == GetMeSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
+                // Add only directories
+                filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
+                continue
+                // Skip elements if action = select directory
+            } else if(getMeSettings.actionType == GetMeSettings.ACTION_SELECT_DIRECTORY && !fileEntry.isDirectory)
+                continue
+
+            // If action = select files - check main content or except extensions
+            // ! WARNING ! We can use only one function: EXCEPT or MAIN content.
+            // In case if user use both - filter main content and ignore except
+            //              |                       |
+            //              V                       V
+
+            // If user set main content extensions - save directories and all files with this extensions
+            if(!getMeSettings.mainContent.isNullOrEmpty()) {
+                getMeSettings.mainContent!!.forEach { extension ->
+                    if(extension == fileEntry.extension || fileEntry.isDirectory)
+                        filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
+                }
+                continue
+            }
+
+            // Add file if user don't filter it by extension or directory action
+            filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
+
+            // If user set except content extensions - remove all files with this extension
+            if(!getMeSettings.exceptContent.isNullOrEmpty() && getMeSettings.mainContent.isNullOrEmpty()) {
+                getMeSettings.exceptContent!!.forEach { extension ->
+                    filesystemEntities.removeAll { file ->
+                        file.extension == extension
+                    }
+                }
+            }
+
         }
 
-        return filesystemEntities
+        return filesystemEntities.toList()
     }
 }

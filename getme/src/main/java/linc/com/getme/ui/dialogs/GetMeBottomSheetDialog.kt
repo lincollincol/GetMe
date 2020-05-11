@@ -18,6 +18,7 @@ import linc.com.getme.R
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
+import linc.com.getme.domain.GetMeSettings
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
@@ -42,7 +43,9 @@ class GetMeBottomSheetDialog : BottomSheetDialogFragment(),
 
         if(presenter == null) {
             presenter = FilesystemPresenter(
-                FilesystemInteractor(StorageHelper(activity!!.applicationContext)),
+                FilesystemInteractor(StorageHelper(activity!!.applicationContext), GetMeSettings(
+                    GetMeSettings.ACTION_SELECT_FILE)
+                ),
                 StateManager()
             )
         }

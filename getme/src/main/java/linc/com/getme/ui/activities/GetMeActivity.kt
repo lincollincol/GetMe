@@ -9,6 +9,7 @@ import linc.com.getme.R
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
+import linc.com.getme.domain.GetMeSettings
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
@@ -29,7 +30,7 @@ class GetMeActivity :
 
         if(presenter == null) {
             presenter = FilesystemPresenter(
-                FilesystemInteractor(StorageHelper(this)),
+                FilesystemInteractor(StorageHelper(this), GetMeSettings(GetMeSettings.ACTION_SELECT_FILE)),
                 StateManager()
             )
         }
@@ -74,7 +75,6 @@ class GetMeActivity :
     }
 
     override fun onBackPressed() {
-//        super.onBackPressed()
         presenter?.openPreviousFilesystemEntity()
     }
 

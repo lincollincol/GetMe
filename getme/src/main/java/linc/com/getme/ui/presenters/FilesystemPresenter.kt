@@ -1,7 +1,6 @@
 package linc.com.getme.ui.presenters
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import linc.com.getme.domain.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
@@ -59,7 +58,7 @@ class FilesystemPresenter(
             interactor.getRoot()
         }else {
             interactor.openFilesystemEntity(
-                FilesystemEntity.newInstance(stateManager.getLast())
+                FilesystemEntity.fromPath(stateManager.getLast())
             )
         }
 
