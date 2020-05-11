@@ -1,17 +1,26 @@
 package linc.com.getme.domain
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.schedulers.Schedulers
 import linc.com.getme.device.StorageHelper
+import linc.com.getme.utils.StateManager
 
 import java.io.File
 
-class FilesystemInteractor(
+internal class FilesystemInteractor(
     private val storageHelper: StorageHelper,
+    private val stateManager: StateManager,
     private val getMeSettings: GetMeSettings
 ) {
 
     fun getRoot(): Single<List<FilesystemEntity>> {
         return Single.create {
+
+            // todo replace with get roots
+            // todo replace with get roots
+            // todo replace with get roots
+
             val filesystemEntities = mutableListOf<FilesystemEntity>()
 
             // storage/emulated/0
@@ -32,13 +41,38 @@ class FilesystemInteractor(
 
     fun openFilesystemEntity(filesystemEntity: FilesystemEntity): Single<List<FilesystemEntity>> {
         return Single.fromCallable {
+            stateManager.goTo(filesystemEntity.path)
             openDirectory(File(filesystemEntity.path))
         }
     }
 
+    fun openPreviousFilesystemEntity(): Single<List<FilesystemEntity>> {
+        return Single.create {
+            stateManager.goBack()
+            if(!stateManager.hasState() ) {
+                it.onSuccess(emptyList())
+            }else if(stateManager.getLast() == "root") {
+                val filesystemRootEntities = getDeviceStorages().filter {
+                    path -> path != null
+                }.map {
+                    path -> FilesystemEntity.fromPath(path!!)
+                }
+                it.onSuccess(filesystemRootEntities)
+            }else {
+                it.onSuccess(
+                    openDirectory(File(stateManager.getLast()))
+                )
+            }
+        }
+    }
+
+    private fun getDeviceStorages() = mutableListOf<String?>().apply {
+        add(storageHelper.getExternalStoragePath(false))
+        add(storageHelper.getExternalStoragePath(true))
+    }
+
     private fun openDirectory(directory: File): List<FilesystemEntity> {
         val filesystemEntities = hashSetOf<FilesystemEntity>()
-
 
         for (fileEntry in directory.listFiles()) {
             if(getMeSettings.actionType == GetMeSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
@@ -79,5 +113,57 @@ class FilesystemInteractor(
         }
 
         return filesystemEntities.toList()
+    }
+
+    private fun usePath(path: String, allowBackPath: Boolean): Single<List<String>> {
+        return Single.create {
+            val previousDirectories = mutableListOf<String>()
+            val file = File(path)
+
+            if(!file.exists())
+                it.onError(Exception("Invalid path"))
+
+            if(!allowBackPath)
+                it.onSuccess(mutableListOf(path))
+
+            val possibleRoots = mutableListOf<String?>().apply {
+                add(storageHelper.getExternalStoragePath(false))
+                add(storageHelper.getExternalStoragePath(true))
+            }.forEach { root ->
+                println(root)
+                if(root != null && path.contains(root)) {
+                    while(true) {
+                        val previousPath = downgradePath(path)
+                        previousDirectories.add(previousPath)
+                        if(nameFromPath(previousPath) == root) break
+                    }
+                }
+
+            }
+
+            println(previousDirectories)
+        }
+    }
+
+    /**
+     * @param path - path to file or directory. Example storage/emulated/0/dir_one
+     * @return file name.
+     * @sample
+     *      input: storage/emulated/0/dir_one
+     *      output: dir_one
+     * */
+    private fun nameFromPath(path: String) = path.apply {
+        return drop(lastIndexOf(File.separator) + 1)
+    }
+
+    /**
+     * @param path - path to file or directory. Example storage/emulated/0/dir_one
+     * @return previous directory path.
+     * @sample
+     *      input: storage/emulated/0/dir_one
+     *      output: storage/emulated/0
+     * */
+    private fun downgradePath(path: String) = path.apply {
+        return dropLast(length - lastIndexOf(File.separator))
     }
 }

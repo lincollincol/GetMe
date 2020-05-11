@@ -54,9 +54,9 @@ internal class GetMeFragment : Fragment(),
             presenter = FilesystemPresenter(
                 FilesystemInteractor(
                     StorageHelper(activity!!.applicationContext),
+                    StateManager(),
                     arguments?.getParcelable(KEY_SETTINGS)!!
-                ),
-                StateManager()
+                )
             )
         }
 
@@ -156,6 +156,5 @@ internal class GetMeFragment : Fragment(),
             fileManagerCompleteCallback.onFilesSelected(emptyList())
         }
     }
-
 
 }

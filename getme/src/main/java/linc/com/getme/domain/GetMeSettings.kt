@@ -6,11 +6,13 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class GetMeSettings(
     val actionType: Int,
-    var mainContent: MutableList<String>? = null,
-    var exceptContent: MutableList<String>? = null
+    val mainContent: MutableList<String>? = null,
+    val exceptContent: MutableList<String>? = null,
+    val path: String? = null,
+    val allowBackPath: Boolean = false
 ) : Parcelable {
 
-    fun useContent(extensions: List<String>) {
+    /*fun useContent(extensions: List<String>) {
         if(mainContent == null) {
             mainContent = mutableListOf()
         }
@@ -24,7 +26,7 @@ class GetMeSettings(
         }
         exceptContent?.clear()
         exceptContent?.addAll(extensions)
-    }
+    }*/
 
     companion object {
         const val ACTION_SELECT_DIRECTORY = 0

@@ -35,12 +35,12 @@ class GetMeDialog : DialogFragment(),
         super.onCreate(savedInstanceState)
 
         if(presenter == null) {
-            presenter = FilesystemPresenter(
-                FilesystemInteractor(StorageHelper(activity!!.applicationContext), GetMeSettings(
-                    GetMeSettings.ACTION_SELECT_FILE)
-                ),
-                StateManager()
-            )
+//            presenter = FilesystemPresenter(
+//                FilesystemInteractor(StorageHelper(activity!!.applicationContext), GetMeSettings(
+//                    GetMeSettings.ACTION_SELECT_FILE)
+//                ),
+//                StateManager()
+//            )
         }
 
     }

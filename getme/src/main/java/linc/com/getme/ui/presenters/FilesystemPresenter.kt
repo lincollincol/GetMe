@@ -8,9 +8,8 @@ import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.StateManager
 
 
-class FilesystemPresenter(
-    private val interactor: FilesystemInteractor,
-    private val stateManager: StateManager
+internal class FilesystemPresenter(
+    private val interactor: FilesystemInteractor
 ) {
 
     private var view: FilesystemView? = null
@@ -39,8 +38,6 @@ class FilesystemPresenter(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                stateManager.goTo(filesystemEntity.path)
-                println(filesystemEntity.path)
                 view?.showFilesystemEntities(it)
             }, {
                 view?.showError(it.localizedMessage)
@@ -48,27 +45,18 @@ class FilesystemPresenter(
     }
 
     fun openPreviousFilesystemEntity() {
-        stateManager.goBack()
-
-//        val filesystemEntities: Single<List<FilesystemEntity>>
-        val filesystemEntities = if(!stateManager.hasState() ) {
-            view?.closeManager()
-            return
-        }else if(stateManager.getLast() == "root") {
-            interactor.getRoot()
-        }else {
-            interactor.openFilesystemEntity(
-                FilesystemEntity.fromPath(stateManager.getLast())
-            )
-        }
-
-        filesystemEntities
+        interactor.openPreviousFilesystemEntity()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                view?.showFilesystemEntities(it)
+                if(it.isEmpty()) {
+                    view?.closeManager()
+                }else {
+                    view?.showFilesystemEntities(it)
+                }
+
             }, {
-                view?.showError(it.localizedMessage)
+                view?.showError(it.message!!)
             })
     }
 

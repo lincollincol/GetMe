@@ -29,10 +29,10 @@ class GetMeActivity :
         setContentView(R.layout.activity_get_me)
 
         if(presenter == null) {
-            presenter = FilesystemPresenter(
-                FilesystemInteractor(StorageHelper(this), GetMeSettings(GetMeSettings.ACTION_SELECT_FILE)),
-                StateManager()
-            )
+//            presenter = FilesystemPresenter(
+//                FilesystemInteractor(StorageHelper(this), GetMeSettings(GetMeSettings.ACTION_SELECT_FILE)),
+//                StateManager()
+//            )
         }
 
         filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {

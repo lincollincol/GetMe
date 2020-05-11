@@ -38,20 +38,6 @@ class MainActivity : AppCompatActivity(),
                 ) {}
             }).check()
 
-        // Fragment
-//        openFileManager.setOnClickListener {
-//            supportFragmentManager.beginTransaction()
-//                .replace(
-//                    R.id.fragmentContainer,
-//                    GetMeFragment.newInstance(
-//                        this,
-//                        this,
-//                        this,
-//                        getFiles
-//                    )
-//                ).commit()
-//        }
-
         GetMe(
             supportFragmentManager,
             R.id.fragmentContainer,
