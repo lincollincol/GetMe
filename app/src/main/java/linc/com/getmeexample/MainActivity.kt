@@ -42,8 +42,10 @@ class MainActivity : AppCompatActivity(),
             supportFragmentManager,
             R.id.fragmentContainer,
             GetMeSettings(
-                actionType = GetMeSettings.ACTION_SELECT_FILE,
-                mainContent = mutableListOf("pdf", "mp3")
+                actionType = GetMeSettings.ACTION_SELECT_FILE
+//                mainContent = mutableListOf("pdf", "mp3"),
+//                path = "/storage/emulated/0/viber/media",
+//                allowBackPath = true
             ),
             this,
             this,

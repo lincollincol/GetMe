@@ -5,7 +5,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import linc.com.getme.domain.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
 import linc.com.getme.ui.views.FilesystemView
-import linc.com.getme.utils.StateManager
 
 
 internal class FilesystemPresenter(
@@ -23,13 +22,13 @@ internal class FilesystemPresenter(
     }
 
     fun getFilesystemEntities() {
-        interactor.getRoot()
+        interactor.execute()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 view?.showFilesystemEntities(it)
             }, {
-                view?.showError(it.localizedMessage)
+                it.printStackTrace()
             })
     }
 
@@ -40,7 +39,7 @@ internal class FilesystemPresenter(
             .subscribe({
                 view?.showFilesystemEntities(it)
             }, {
-                view?.showError(it.localizedMessage)
+                it.printStackTrace()
             })
     }
 
@@ -56,7 +55,7 @@ internal class FilesystemPresenter(
                 }
 
             }, {
-                view?.showError(it.message!!)
+                it.printStackTrace()
             })
     }
 

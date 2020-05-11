@@ -119,10 +119,6 @@ internal class GetMeFragment : Fragment(),
         filesystemEntityKeyProvider.setFilesystemEntities(filesystemEntities)
     }
 
-    override fun showError(message: String) {
-        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-    }
-
     override fun closeManager() {
         closeFileManagerCallback.onCloseFileManager()
     }

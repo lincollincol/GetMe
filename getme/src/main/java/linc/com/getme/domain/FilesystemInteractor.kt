@@ -1,8 +1,6 @@
 package linc.com.getme.domain
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.utils.StateManager
 
@@ -14,28 +12,25 @@ internal class FilesystemInteractor(
     private val getMeSettings: GetMeSettings
 ) {
 
-    fun getRoot(): Single<List<FilesystemEntity>> {
+    fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
 
-            // todo replace with get roots
-            // todo replace with get roots
-            // todo replace with get roots
-
-            val filesystemEntities = mutableListOf<FilesystemEntity>()
-
-            // storage/emulated/0
-            filesystemEntities.add(FilesystemEntity.fromPath(
-                storageHelper.getExternalStoragePath(false)!!
-            ))
-
-            // sd card: storage/0000-0000
-            val sdCard = storageHelper.getExternalStoragePath(true)
-
-            if(sdCard != null) {
-                filesystemEntities.add(FilesystemEntity.fromPath(sdCard))
+            if(getMeSettings.path != null) {
+                val valid = usePath(getMeSettings.path, getMeSettings.allowBackPath)
+                if(valid) {
+                    it.onSuccess(openDirectory(
+                        File(getMeSettings.path)
+                    ))
+                } else {
+                    it.onError(GetMeInvalidPathException())
+                }
             }
 
-            it.onSuccess(filesystemEntities)
+            it.onSuccess(
+                getDeviceStorage()
+                    .filterNotNull()
+                    .map { path -> FilesystemEntity.fromPath(path) }
+            )
         }
     }
 
@@ -52,11 +47,11 @@ internal class FilesystemInteractor(
             if(!stateManager.hasState() ) {
                 it.onSuccess(emptyList())
             }else if(stateManager.getLast() == "root") {
-                val filesystemRootEntities = getDeviceStorages().filter {
-                    path -> path != null
-                }.map {
-                    path -> FilesystemEntity.fromPath(path!!)
-                }
+                val filesystemRootEntities = getDeviceStorage()
+                    .filterNotNull()
+                    .map {
+                        path -> FilesystemEntity.fromPath(path)
+                    }
                 it.onSuccess(filesystemRootEntities)
             }else {
                 it.onSuccess(
@@ -66,9 +61,17 @@ internal class FilesystemInteractor(
         }
     }
 
-    private fun getDeviceStorages() = mutableListOf<String?>().apply {
-        add(storageHelper.getExternalStoragePath(false))
+    /**
+     * @return all storage available in the device
+     * @sample
+     *      ext device(isn't removable): /storage/emulated/0
+     *      sd card device(removable): /storage/0000-0000/
+     * */
+    private fun getDeviceStorage() = mutableListOf<String?>().apply {
+        // device: /storage/emulated/0
         add(storageHelper.getExternalStoragePath(true))
+        // sd card: /storage/0000-0000
+        add(storageHelper.getExternalStoragePath(false))
     }
 
     private fun openDirectory(directory: File): List<FilesystemEntity> {
@@ -91,7 +94,7 @@ internal class FilesystemInteractor(
 
             // If user set main content extensions - save directories and all files with this extensions
             if(!getMeSettings.mainContent.isNullOrEmpty()) {
-                getMeSettings.mainContent!!.forEach { extension ->
+                getMeSettings.mainContent.forEach { extension ->
                     if(extension == fileEntry.extension || fileEntry.isDirectory)
                         filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 }
@@ -103,7 +106,7 @@ internal class FilesystemInteractor(
 
             // If user set except content extensions - remove all files with this extension
             if(!getMeSettings.exceptContent.isNullOrEmpty() && getMeSettings.mainContent.isNullOrEmpty()) {
-                getMeSettings.exceptContent!!.forEach { extension ->
+                getMeSettings.exceptContent.forEach { extension ->
                     filesystemEntities.removeAll { file ->
                         file.extension == extension
                     }
@@ -115,34 +118,52 @@ internal class FilesystemInteractor(
         return filesystemEntities.toList()
     }
 
-    private fun usePath(path: String, allowBackPath: Boolean): Single<List<String>> {
-        return Single.create {
-            val previousDirectories = mutableListOf<String>()
-            val file = File(path)
+    /**
+     * @param path - path to directory
+     * @param allowBackPath - flag that allow to use previous directories. State manager will be rebuilt if true
+     * @return boolean that allow to use path
+     * @sample
+     *      path is valid: return true and rebuilt state manager if user set true to allowBackPath
+     *      path is invalid: return false emmit onError with mistake message
+     * */
+    private fun usePath(path: String, allowBackPath: Boolean): Boolean {
+        val directory = File(path)
 
-            if(!file.exists())
-                it.onError(Exception("Invalid path"))
+        // Check if path is valid
+        if(!directory.exists())
+            return false
 
-            if(!allowBackPath)
-                it.onSuccess(mutableListOf(path))
+        // Check that this is a directory
+        if(directory.isFile)
+            return false
 
-            val possibleRoots = mutableListOf<String?>().apply {
-                add(storageHelper.getExternalStoragePath(false))
-                add(storageHelper.getExternalStoragePath(true))
-            }.forEach { root ->
-                println(root)
-                if(root != null && path.contains(root)) {
-                    while(true) {
-                        val previousPath = downgradePath(path)
-                        previousDirectories.add(previousPath)
-                        if(nameFromPath(previousPath) == root) break
-                    }
+        // Allow to use this path if it is valid and user don't need back path
+        if(!allowBackPath)
+            return true
+
+        // If user need back path - rebuild back stack in state manager
+        stateManager.clear()
+        getDeviceStorage().forEach { root ->
+            // Find root file directory
+            if(root != null && path.contains(root)) {
+                // Add previous directories to state manager
+                var previousPath: String = path
+                stateManager.goTo(path)
+                while(true) {
+                    previousPath = downgradePath(previousPath)
+                    stateManager.goTo(previousPath)
+                    if(root.contains(nameFromPath(previousPath))) break
                 }
-
             }
-
-            println(previousDirectories)
         }
+
+        // Add root and reverse state manager stack because current state is reversed
+        stateManager.apply {
+            goTo("root")
+            reverse()
+        }
+        // Allow to use path with back path
+        return true
     }
 
     /**

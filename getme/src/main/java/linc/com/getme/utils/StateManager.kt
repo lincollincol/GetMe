@@ -20,5 +20,8 @@ class StateManager {
 
     fun hasState(): Boolean = !currentPathState.empty()
 
+    fun clear() = currentPathState.clear()
+
+    fun reverse() = currentPathState.reverse()
 
 }

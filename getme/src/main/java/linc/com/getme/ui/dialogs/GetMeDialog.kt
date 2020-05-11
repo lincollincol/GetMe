@@ -82,9 +82,9 @@ class GetMeDialog : DialogFragment(),
         filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntities)
     }
 
-    override fun showError(message: String) {
-        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-    }
+//    override fun showError(message: String) {
+//        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+//    }
 
     override fun closeManager() {
         dismiss()
