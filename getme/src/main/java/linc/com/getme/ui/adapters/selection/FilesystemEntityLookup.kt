@@ -3,7 +3,7 @@ package linc.com.getme.ui.adapters.selection
 import android.view.MotionEvent
 import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.widget.RecyclerView
-import linc.com.getme.domain.FilesystemEntity
+import linc.com.getme.domain.models.FilesystemEntity
 
 class FilesystemEntityLookup(
     private val recyclerView: RecyclerView

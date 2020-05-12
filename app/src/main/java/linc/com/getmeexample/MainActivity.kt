@@ -3,6 +3,7 @@ package linc.com.getmeexample
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.recyclerview.selection.SelectionTracker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -10,15 +11,19 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_main.*
 import linc.com.getme.GetMe
-import linc.com.getme.domain.GetMeSettings
+import linc.com.getme.domain.models.FilesystemEntity
+import linc.com.getme.domain.models.GetMeFilesystemSettings
+import linc.com.getme.ui.GetMeInterfaceSettings
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerBackListener
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
+import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import java.io.File
 
 class MainActivity : AppCompatActivity(),
     CloseFileManagerCallback,
-    FileManagerCompleteCallback {
+    FileManagerCompleteCallback,
+    SelectionTrackerCallback {
 
     override lateinit var fileManagerBackListener: FileManagerBackListener
 
@@ -41,12 +46,13 @@ class MainActivity : AppCompatActivity(),
         GetMe(
             supportFragmentManager,
             R.id.fragmentContainer,
-            GetMeSettings(
-                actionType = GetMeSettings.ACTION_SELECT_FILE
+            GetMeFilesystemSettings(
+                actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
 //                mainContent = mutableListOf("pdf", "mp3"),
 //                path = "/storage/emulated/0/viber/media",
 //                allowBackPath = true
             ),
+            GetMeInterfaceSettings(),
             this,
             this,
             this,
@@ -65,6 +71,15 @@ class MainActivity : AppCompatActivity(),
 
     override fun onFilesSelected(selectedFiles: List<File>) {
         println("OKOKOKOKOKOK")
+    }
+
+    override fun onSelectionTrackerCreated(selectionTracker: SelectionTracker<FilesystemEntity>) {
+        selectionTracker.addObserver(object : SelectionTracker.SelectionObserver<FilesystemEntity>() {
+            override fun onSelectionChanged() {
+                super.onSelectionChanged()
+                println(selectionTracker.selection.size())
+            }
+        })
     }
 
 }

@@ -2,24 +2,27 @@ package linc.com.getme.domain
 
 import io.reactivex.rxjava3.core.Single
 import linc.com.getme.device.StorageHelper
-import linc.com.getme.utils.StateManager
+import linc.com.getme.domain.models.FilesystemEntity
+import linc.com.getme.domain.models.GetMeFilesystemSettings
+import linc.com.getme.domain.utils.GetMeInvalidPathException
+import linc.com.getme.domain.utils.StateManager
 
 import java.io.File
 
 internal class FilesystemInteractor(
     private val storageHelper: StorageHelper,
     private val stateManager: StateManager,
-    private val getMeSettings: GetMeSettings
+    private val getMeFilesystemSettings: GetMeFilesystemSettings
 ) {
 
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
 
-            if(getMeSettings.path != null) {
-                val valid = usePath(getMeSettings.path, getMeSettings.allowBackPath)
+            if(getMeFilesystemSettings.path != null) {
+                val valid = usePath(getMeFilesystemSettings.path, getMeFilesystemSettings.allowBackPath)
                 if(valid) {
                     it.onSuccess(openDirectory(
-                        File(getMeSettings.path)
+                        File(getMeFilesystemSettings.path)
                     ))
                 } else {
                     it.onError(GetMeInvalidPathException())
@@ -78,12 +81,12 @@ internal class FilesystemInteractor(
         val filesystemEntities = hashSetOf<FilesystemEntity>()
 
         for (fileEntry in directory.listFiles()) {
-            if(getMeSettings.actionType == GetMeSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
+            if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
                 // Add only directories
                 filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 continue
                 // Skip elements if action = select directory
-            } else if(getMeSettings.actionType == GetMeSettings.ACTION_SELECT_DIRECTORY && !fileEntry.isDirectory)
+            } else if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && !fileEntry.isDirectory)
                 continue
 
             // If action = select files - check main content or except extensions
@@ -93,8 +96,8 @@ internal class FilesystemInteractor(
             //              V                       V
 
             // If user set main content extensions - save directories and all files with this extensions
-            if(!getMeSettings.mainContent.isNullOrEmpty()) {
-                getMeSettings.mainContent.forEach { extension ->
+            if(!getMeFilesystemSettings.mainContent.isNullOrEmpty()) {
+                getMeFilesystemSettings.mainContent.forEach { extension ->
                     if(extension == fileEntry.extension || fileEntry.isDirectory)
                         filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 }
@@ -105,8 +108,8 @@ internal class FilesystemInteractor(
             filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
 
             // If user set except content extensions - remove all files with this extension
-            if(!getMeSettings.exceptContent.isNullOrEmpty() && getMeSettings.mainContent.isNullOrEmpty()) {
-                getMeSettings.exceptContent.forEach { extension ->
+            if(!getMeFilesystemSettings.exceptContent.isNullOrEmpty() && getMeFilesystemSettings.mainContent.isNullOrEmpty()) {
+                getMeFilesystemSettings.exceptContent.forEach { extension ->
                     filesystemEntities.removeAll { file ->
                         file.extension == extension
                     }

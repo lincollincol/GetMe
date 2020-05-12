@@ -1,4 +1,4 @@
-package linc.com.getme.domain
+package linc.com.getme.domain.utils
 
 import java.lang.Exception
 

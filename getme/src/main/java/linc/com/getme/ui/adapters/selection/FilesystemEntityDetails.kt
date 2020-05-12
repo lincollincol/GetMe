@@ -1,7 +1,7 @@
 package linc.com.getme.ui.adapters.selection
 
 import androidx.recyclerview.selection.ItemDetailsLookup
-import linc.com.getme.domain.FilesystemEntity
+import linc.com.getme.domain.models.FilesystemEntity
 
 class FilesystemEntityDetails(
     private val position: Int,

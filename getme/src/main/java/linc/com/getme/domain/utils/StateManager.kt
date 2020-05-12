@@ -1,8 +1,8 @@
-package linc.com.getme.utils
+package linc.com.getme.domain.utils
 
 import java.util.*
 
-class StateManager {
+internal class StateManager {
 
     private val currentPathState = Stack<String>().apply {
         push("root")

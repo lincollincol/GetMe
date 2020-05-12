@@ -4,22 +4,18 @@ import android.app.Dialog
 import android.graphics.Point
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
-import linc.com.getme.device.StorageHelper
-import linc.com.getme.domain.FilesystemEntity
-import linc.com.getme.domain.FilesystemInteractor
-import linc.com.getme.domain.GetMeSettings
+import linc.com.getme.domain.models.FilesystemEntity
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
-import linc.com.getme.utils.StateManager
 
 
+@Deprecated(message = "This function will be available in the future")
 class GetMeDialog : DialogFragment(),
     FilesystemView,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
@@ -28,6 +24,7 @@ class GetMeDialog : DialogFragment(),
     private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
 
     companion object {
+        @Deprecated(message = "This function will be available in the future", level = DeprecationLevel.HIDDEN)
         fun newInstance() = GetMeDialog()
     }
 
@@ -82,12 +79,12 @@ class GetMeDialog : DialogFragment(),
         filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntities)
     }
 
-//    override fun showError(message: String) {
-//        Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-//    }
-
     override fun closeManager() {
         dismiss()
+    }
+
+    override fun enableSelection(enable: Boolean) {
+        TODO("Not yet implemented")
     }
 
     override fun onClick(filesystemEntity: FilesystemEntity) {

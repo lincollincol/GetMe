@@ -56,6 +56,7 @@ dependencies {
 
     // Design
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc01"
 
 //    implementation 'com.github.lincollincol:GetMe:1.0'
 

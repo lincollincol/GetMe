@@ -1,10 +1,10 @@
-package linc.com.getme.domain
+package linc.com.getme.domain.models
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-class GetMeSettings(
+class GetMeFilesystemSettings(
     val actionType: Int,
     val mainContent: MutableList<String>? = null,
     val exceptContent: MutableList<String>? = null,

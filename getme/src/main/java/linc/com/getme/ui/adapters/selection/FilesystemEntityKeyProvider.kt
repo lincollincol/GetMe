@@ -1,7 +1,7 @@
 package linc.com.getme.ui.adapters.selection
 
 import androidx.recyclerview.selection.ItemKeyProvider
-import linc.com.getme.domain.FilesystemEntity
+import linc.com.getme.domain.models.FilesystemEntity
 
 class FilesystemEntityKeyProvider : ItemKeyProvider<FilesystemEntity>(SCOPE_CACHED) {
     private val filesystemEntities = mutableListOf<FilesystemEntity>()
