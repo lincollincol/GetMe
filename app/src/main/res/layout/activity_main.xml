@@ -7,14 +7,14 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/openFileManager"
+        android:id="@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:text="Open"
+        android:text="back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@id/getFiles"/>
 
     <Button
         android:id="@+id/getFiles"
@@ -23,6 +23,7 @@
         android:layout_marginBottom="10dp"
         android:text="Get Files"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/back"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <FrameLayout

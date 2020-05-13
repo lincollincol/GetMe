@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/filesystemEntityLayout"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
-    android:layout_marginBottom="5dp"
-    android:layout_marginTop="5dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_filesystem_entity"
+    android:clickable="true"
+    android:focusable="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
 
     <ImageView
         android:id="@+id/filesystemEntityTypeIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginStart="10dp"
         android:src="@drawable/ic_folder"
-        android:background="@drawable/shape_background_filesystem_entity_icon"
+        android:background="@drawable/background_filesystem_entity_icon"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,6 +42,7 @@
         android:gravity="center_vertical"
         android:textStyle="bold"
         android:textSize="15sp"
+        android:textColor="?attr/color_text"
         android:text="Android"
         android:maxLines="1"
         android:ellipsize="end"
@@ -55,6 +59,7 @@
         android:layout_marginEnd="10dp"
         android:textSize="13sp"
         android:text="6.12 MB, Apr 24 at 12:36"
+        android:textColor="?attr/color_text"
         android:gravity="center_vertical"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toBottomOf="@id/filesystemEntityTitle"

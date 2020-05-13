@@ -10,5 +10,6 @@ data class FilesystemEntityModel (
     val extension: String = "",
     val lastModified: String = "",
     val size: String = "",
+    val parentDirectory: String = "",
     val isDirectory: Boolean = false
 ) : Parcelable

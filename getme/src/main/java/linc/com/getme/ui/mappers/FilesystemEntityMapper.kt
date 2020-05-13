@@ -4,6 +4,7 @@ import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.utils.DateFormatUtil
 import linc.com.getme.utils.SizeUtil
+import java.io.File
 
 internal class FilesystemEntityMapper {
 
@@ -35,6 +36,9 @@ internal class FilesystemEntityMapper {
             filesystemEntity.extension,
             DateFormatUtil.formatFromLong(filesystemEntity.lastModified),
             SizeUtil.format(filesystemEntity.size),
+            filesystemEntity.path.apply {
+                dropLast(length - lastIndexOf(File.separator))
+            },
             filesystemEntity.isDirectory
         )
     }

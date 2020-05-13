@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Item filesystem entity background attrs  -->
+    <attr name="color_background_default" format="color"/>
+    <attr name="color_background_selected" format="color"/>
+    <attr name="color_background_ripple" format="color"/>
+
+    <!-- Filesystem entity type icon attrs-->
+    <attr name="color_background_circle" format="color"/>
+    <attr name="color_background_icon" format="color"/>
+
+    <attr name="color_text" format="color"/>
+
+</resources>

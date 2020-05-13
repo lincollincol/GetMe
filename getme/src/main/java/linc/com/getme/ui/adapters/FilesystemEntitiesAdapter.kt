@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.RecyclerView
@@ -32,8 +33,10 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
     }
 
     fun updateFilesystemEntities(filesystemEntities: List<FilesystemEntityModel>) {
-        this.filesystemEntityModels.clear()
-        this.filesystemEntityModels.addAll(filesystemEntities)
+        this.filesystemEntityModels.apply {
+            clear()
+            addAll(filesystemEntities)
+        }
         notifyDataSetChanged()
     }
 
@@ -61,7 +64,10 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
         private var selected: Boolean = false
 
         fun bind(filesystemEntityModel: FilesystemEntityModel, selected: Boolean) {
+
             this.selected = selected
+
+            itemView.findViewById<ConstraintLayout>(R.id.filesystemEntityLayout).isSelected = selected
 
             itemView.findViewById<TextView>(R.id.filesystemEntityTitle).text = filesystemEntityModel.title
 
@@ -70,8 +76,11 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
             }
 
             itemView.findViewById<TextView>(R.id.filesystemEntityDetails).apply {
-                visibility = if(filesystemEntityModel.isDirectory) View.GONE else View.VISIBLE
-                text =  "${filesystemEntityModel.size}, ${filesystemEntityModel.lastModified}"
+                val details = when(filesystemEntityModel.isDirectory) {
+                    true -> "Directory"
+                    else -> "${filesystemEntityModel.size}, ${filesystemEntityModel.lastModified}"
+                }
+                text = details
             }
 
             itemView.findViewById<ImageView>(R.id.filesystemEntityTypeIcon).apply {

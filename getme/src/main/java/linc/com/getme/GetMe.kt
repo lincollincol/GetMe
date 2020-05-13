@@ -21,8 +21,11 @@ class GetMe <T : CloseFileManagerCallback> (
     private val closeFileManagerCallback: CloseFileManagerCallback,
     private val fileManagerCompleteCallback: FileManagerCompleteCallback,
     private val selectionTrackerCallback: SelectionTrackerCallback? = null,
-    private val okView: View? = null
+    private val okView: View? = null,
+    private val backView: View? = null,
+    private val firstClearSelectionAfterBack: Boolean = false
 ) {
+
 
     fun show() {
         fragmentManager.beginTransaction()
@@ -38,9 +41,11 @@ class GetMe <T : CloseFileManagerCallback> (
                     setCloseFileManagerCallback(closeFileManagerCallback)
                     setFileManagerCompleteCallback(fileManagerCompleteCallback)
                     if(okView != null) setOkView(okView)
+                    if(backView != null) setBackView(backView, firstClearSelectionAfterBack)
                     if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback)
                 }
             )
+            .addToBackStack(null)
             .commit()
     }
 

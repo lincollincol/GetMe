@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="GetMeDefaultTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="color_background_default">@color/color_background_default</item>
+        <item name="color_background_selected">@color/color_background_selected</item>
+        <item name="color_background_ripple">@color/color_background_ripple</item>
+        <item name="color_background_circle">@color/color_background_circle</item>
+        <item name="color_background_icon">@color/color_background_icon</item>
+        <item name="color_text">@color/color_text</item>
+    </style>
+
+</resources>

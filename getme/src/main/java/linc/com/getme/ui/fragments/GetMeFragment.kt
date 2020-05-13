@@ -1,9 +1,11 @@
 package linc.com.getme.ui.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
@@ -13,26 +15,26 @@ import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemInteractor
+import linc.com.getme.domain.utils.StateManager
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.adapters.selection.FilesystemEntityKeyProvider
 import linc.com.getme.ui.adapters.selection.FilesystemEntityLookup
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerBackListener
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
+import linc.com.getme.ui.callbacks.SelectionTrackerCallback
+import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
-import linc.com.getme.domain.utils.StateManager
-import linc.com.getme.ui.callbacks.SelectionTrackerCallback
-import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
 import java.io.File
+
 
 internal class GetMeFragment : Fragment(),
     FilesystemView,
     FileManagerBackListener,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
-
 
     private lateinit var closeFileManagerCallback: CloseFileManagerCallback
     private lateinit var fileManagerCompleteCallback: FileManagerCompleteCallback
@@ -52,6 +54,7 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
 
         if(presenter == null) {
@@ -82,7 +85,13 @@ internal class GetMeFragment : Fragment(),
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_get_me, container, false)
+    ): View? {
+        inflater.inflate(R.layout.fragment_get_me, container, false)
+        val contextThemeWrapper: Context =
+            ContextThemeWrapper(activity, R.style.GetMeDefaultTheme)
+        val localInflater = inflater.cloneInContext(contextThemeWrapper)
+        return localInflater.inflate(R.layout.fragment_get_me, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -107,8 +116,8 @@ internal class GetMeFragment : Fragment(),
     override fun closeManager(resultFiles: List<File>) {
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
-        // todo uncomment
-//        closeFileManagerCallback.onCloseFileManager()
+//        todo uncomment fragmentManager?.popBackStack()
+        closeFileManagerCallback.onCloseFileManager()
     }
 
     override fun enableSelection(enable: Boolean) {
@@ -166,6 +175,16 @@ internal class GetMeFragment : Fragment(),
                 selectionTracker?.selection?.toList() ?: emptyList()
             )
             selectionTracker?.clearSelection()
+        }
+    }
+
+    fun setBackView(backView: View, firstClearSelection: Boolean) {
+        backView.setOnClickListener {
+            if(selectionTracker?.hasSelection() == true) {
+                selectionTracker?.clearSelection()
+                if(firstClearSelection) return@setOnClickListener
+            }
+            presenter?.openPreviousFilesystemEntity()
         }
     }
 

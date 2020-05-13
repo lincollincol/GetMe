@@ -1,8 +1,10 @@
 package linc.com.getmeexample
 
 import android.Manifest
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.selection.SelectionTracker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -57,13 +59,15 @@ class MainActivity : AppCompatActivity(),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,
             selectionTrackerCallback = this,
-            okView = getFiles
+            okView = getFiles,
+            backView = back,
+            firstClearSelectionAfterBack = true
         ).show()
 
     }
 
     override fun onCloseFileManager() {
-        super.onBackPressed()
+        // todo handle back pressed
     }
 
     override fun onBackPressed() {
@@ -78,7 +82,7 @@ class MainActivity : AppCompatActivity(),
         selectionTracker.addObserver(object : SelectionTracker.SelectionObserver<FilesystemEntityModel>() {
             override fun onSelectionChanged() {
                 super.onSelectionChanged()
-                println(selectionTracker.selection.size())
+                // todo selection
             }
         })
     }
