@@ -2,10 +2,11 @@ package linc.com.getme.domain
 
 import io.reactivex.rxjava3.core.Single
 import linc.com.getme.device.StorageHelper
-import linc.com.getme.domain.models.FilesystemEntity
-import linc.com.getme.domain.models.GetMeFilesystemSettings
+import linc.com.getme.domain.entities.FilesystemEntity
+import linc.com.getme.domain.entities.GetMeFilesystemSettings
 import linc.com.getme.domain.utils.GetMeInvalidPathException
 import linc.com.getme.domain.utils.StateManager
+import linc.com.getme.ui.models.FilesystemEntityModel
 
 import java.io.File
 
@@ -38,9 +39,15 @@ internal class FilesystemInteractor(
     }
 
     fun openFilesystemEntity(filesystemEntity: FilesystemEntity): Single<List<FilesystemEntity>> {
-        return Single.fromCallable {
-            stateManager.goTo(filesystemEntity.path)
-            openDirectory(File(filesystemEntity.path))
+        return Single.create {
+            val directoryContent = openDirectory(File(filesystemEntity.path))
+
+            // Prevent opening files
+            if(directoryContent != null) {
+                stateManager.goTo(filesystemEntity.path)
+                it.onSuccess(directoryContent)
+            }
+
         }
     }
 
@@ -57,11 +64,27 @@ internal class FilesystemInteractor(
                     }
                 it.onSuccess(filesystemRootEntities)
             }else {
-                it.onSuccess(
-                    openDirectory(File(stateManager.getLast()))
-                )
+                it.onSuccess(openDirectory(File(stateManager.getLast())))
             }
         }
+    }
+
+    fun prepareResultFiles(filesystemEntities: List<FilesystemEntity>): Single<List<File>> {
+        return Single.create {
+            val resultFiles = mutableListOf<File>()
+
+            filesystemEntities.forEach { entity ->
+                resultFiles.add(
+                    File(entity.path)
+                )
+            }
+
+            it.onSuccess(resultFiles)
+        }
+    }
+
+    fun prepareResultDirectory(): Single<List<File>> {
+        return Single.fromCallable { mutableListOf(File(stateManager.getLast())) }
     }
 
     /**
@@ -77,17 +100,25 @@ internal class FilesystemInteractor(
         add(storageHelper.getExternalStoragePath(false))
     }
 
-    private fun openDirectory(directory: File): List<FilesystemEntity> {
+    private fun openDirectory(directory: File): List<FilesystemEntity>? {
         val filesystemEntities = hashSetOf<FilesystemEntity>()
+
+
+        // Return null if user try to open file. Manager open only directories
+        if(directory.isFile) {
+            return null
+        }
 
         for (fileEntry in directory.listFiles()) {
             if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
+                println("FIRST_IF_${fileEntry.name}")
                 // Add only directories
                 filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 continue
                 // Skip elements if action = select directory
             } else if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && !fileEntry.isDirectory)
                 continue
+
 
             // If action = select files - check main content or except extensions
             // ! WARNING ! We can use only one function: EXCEPT or MAIN content.
@@ -101,6 +132,7 @@ internal class FilesystemInteractor(
                     if(extension == fileEntry.extension || fileEntry.isDirectory)
                         filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 }
+                println("SECoND_IF_${fileEntry.name}")
                 continue
             }
 
@@ -114,9 +146,12 @@ internal class FilesystemInteractor(
                         file.extension == extension
                     }
                 }
+                println("THIRD_IF_${fileEntry.name}")
             }
 
         }
+
+        println("RETURN === ${filesystemEntities.size}")
 
         return filesystemEntities.toList()
     }

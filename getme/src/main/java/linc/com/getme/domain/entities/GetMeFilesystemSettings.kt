@@ -1,15 +1,15 @@
-package linc.com.getme.domain.models
+package linc.com.getme.domain.entities
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class GetMeFilesystemSettings(
-    val actionType: Int,
-    val mainContent: MutableList<String>? = null,
-    val exceptContent: MutableList<String>? = null,
-    val path: String? = null,
-    val allowBackPath: Boolean = false
+    internal val actionType: Int,
+    internal val mainContent: MutableList<String>? = null,
+    internal val exceptContent: MutableList<String>? = null,
+    internal val path: String? = null,
+    internal val allowBackPath: Boolean = false
 ) : Parcelable {
 
     /*fun useContent(extensions: List<String>) {

@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
 import linc.com.getme.device.StorageHelper
-import linc.com.getme.domain.models.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.adapters.selection.FilesystemEntityKeyProvider
@@ -25,8 +24,9 @@ import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
 import linc.com.getme.domain.utils.StateManager
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
-import linc.com.getme.utils.Constants
+import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
+import java.io.File
 
 internal class GetMeFragment : Fragment(),
     FilesystemView,
@@ -39,9 +39,10 @@ internal class GetMeFragment : Fragment(),
     private lateinit var selectionTrackerCallback: SelectionTrackerCallback
 
     private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
-    private lateinit var filesystemEntityKeyProvider: FilesystemEntityKeyProvider
+    private var filesystemEntityKeyProvider: FilesystemEntityKeyProvider? = null
     private var presenter: FilesystemPresenter? = null
 
+    private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
     private lateinit var filesystemEntities: RecyclerView
 
     companion object {
@@ -98,47 +99,54 @@ internal class GetMeFragment : Fragment(),
 
     }
 
-    override fun showFilesystemEntities(filesystemEntities: List<FilesystemEntity>) {
-        filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntities)
-        filesystemEntityKeyProvider.setFilesystemEntities(filesystemEntities)
+    override fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
+        filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntityModels)
+        filesystemEntityKeyProvider?.setFilesystemEntities(filesystemEntityModels)
     }
 
-    override fun closeManager() {
-        closeFileManagerCallback.onCloseFileManager()
+    override fun closeManager(resultFiles: List<File>) {
+        if(!resultFiles.isNullOrEmpty())
+            fileManagerCompleteCallback.onFilesSelected(resultFiles)
+        // todo uncomment
+//        closeFileManagerCallback.onCloseFileManager()
     }
 
     override fun enableSelection(enable: Boolean) {
+        if (!enable) return
         filesystemEntityKeyProvider = FilesystemEntityKeyProvider()
 
-        val selectionTracker = SelectionTracker.Builder(
+        selectionTracker = SelectionTracker.Builder(
                 "SELECTION_IDDD",
                 filesystemEntities,
-                filesystemEntityKeyProvider,
+                filesystemEntityKeyProvider!!,
                 FilesystemEntityLookup(filesystemEntities),
-                StorageStrategy.createParcelableStorage(FilesystemEntity::class.java)
+                StorageStrategy.createParcelableStorage(FilesystemEntityModel::class.java)
             ).withSelectionPredicate(SelectionPredicates.createSelectAnything())
             .build()
 
-//        selectionTrackerCallback.onSelectionTrackerCreated(selectionTracker)
-
-        /*selectionTracker.addObserver(object : SelectionTracker.SelectionObserver<FilesystemEntity>() {
-            override fun onSelectionChanged() {
-                super.onSelectionChanged()
-            }
-        })*/
+        selectionTrackerCallback.onSelectionTrackerCreated(selectionTracker!!)
+        filesystemEntitiesAdapter.setSelectionTracker(selectionTracker!!)
     }
 
-    override fun onClick(filesystemEntity: FilesystemEntity) {
-        presenter?.openFilesystemEntity(filesystemEntity)
+    override fun onClick(filesystemEntityModel: FilesystemEntityModel) {
+        presenter?.handleFilesystemEntityAction(filesystemEntityModel)
     }
 
     override fun backPressedInFileManager() {
+        if(selectionTracker?.hasSelection() == true) {
+            selectionTracker?.clearSelection()
+            return
+        }
         presenter?.openPreviousFilesystemEntity()
     }
 
     /**
      * External callbacks
      */
+
+    fun <T : CloseFileManagerCallback> setParentComponent(parentComponent: T) {
+        parentComponent.fileManagerBackListener = this
+    }
 
     fun setCloseFileManagerCallback(closeFileManagerCallback: CloseFileManagerCallback) {
         this.closeFileManagerCallback = closeFileManagerCallback
@@ -148,13 +156,16 @@ internal class GetMeFragment : Fragment(),
         this.fileManagerCompleteCallback = fileManagerCompleteCallback
     }
 
-    fun <T : CloseFileManagerCallback> setParentComponent(parentComponent: T) {
-        parentComponent.fileManagerBackListener = this
+    fun setSelectionCallback(selectionTrackerCallback: SelectionTrackerCallback) {
+        this.selectionTrackerCallback = selectionTrackerCallback
     }
 
     fun setOkView(okView: View) {
         okView.setOnClickListener {
-            fileManagerCompleteCallback.onFilesSelected(emptyList())
+            presenter?.prepareResultFiles(
+                selectionTracker?.selection?.toList() ?: emptyList()
+            )
+            selectionTracker?.clearSelection()
         }
     }
 

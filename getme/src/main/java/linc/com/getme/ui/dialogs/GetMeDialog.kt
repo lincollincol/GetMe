@@ -9,18 +9,18 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
-import linc.com.getme.domain.models.FilesystemEntity
+import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
 
 
 @Deprecated(message = "This function will be available in the future")
-class GetMeDialog : DialogFragment(),
-    FilesystemView,
-    FilesystemEntitiesAdapter.FilesystemEntityClickListener {
+class GetMeDialog : DialogFragment() {
+//    FilesystemView,
+//    FilesystemEntitiesAdapter.FilesystemEntityClickListener {
 
-    private var presenter: FilesystemPresenter? = null
+    /*private var presenter: FilesystemPresenter? = null
     private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
 
     companion object {
@@ -119,6 +119,6 @@ class GetMeDialog : DialogFragment(),
     override fun onStop() {
         super.onStop()
         presenter?.unbind()
-    }
+    }*/
 
 }

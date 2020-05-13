@@ -5,11 +5,9 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class GetMeInterfaceSettings(
-    val selectionType: Int = SELECTION_SINGLE
+    internal val selectionType: Int = SELECTION_SINGLE,
+    internal var actionType: Int = 0
 ) : Parcelable {
-
-
-
 
     companion object {
         const val SELECTION_SINGLE = 0

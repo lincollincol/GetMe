@@ -1,15 +1,16 @@
 package linc.com.getme.ui.adapters.selection
 
 import androidx.recyclerview.selection.ItemKeyProvider
-import linc.com.getme.domain.models.FilesystemEntity
+import linc.com.getme.ui.models.FilesystemEntityModel
 
-class FilesystemEntityKeyProvider : ItemKeyProvider<FilesystemEntity>(SCOPE_CACHED) {
-    private val filesystemEntities = mutableListOf<FilesystemEntity>()
-    override fun getKey(position: Int): FilesystemEntity? = filesystemEntities[position]
-    override fun getPosition(key: FilesystemEntity): Int = filesystemEntities.indexOf(key)
+class FilesystemEntityKeyProvider : ItemKeyProvider<FilesystemEntityModel>(SCOPE_CACHED) {
+    private val filesystemEntityModel = mutableListOf<FilesystemEntityModel>()
 
-    fun setFilesystemEntities(filesystemEntities: List<FilesystemEntity>) {
-        this.filesystemEntities.clear()
-        this.filesystemEntities.addAll(filesystemEntities)
+    override fun getKey(position: Int): FilesystemEntityModel? = filesystemEntityModel[position]
+    override fun getPosition(key: FilesystemEntityModel): Int = filesystemEntityModel.indexOf(key)
+
+    fun setFilesystemEntities(filesystemEntityModel: List<FilesystemEntityModel>) {
+        this.filesystemEntityModel.clear()
+        this.filesystemEntityModel.addAll(filesystemEntityModel)
     }
 }

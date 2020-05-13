@@ -9,29 +9,31 @@ import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
-import linc.com.getme.domain.models.FilesystemEntity
+import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.adapters.selection.FilesystemEntityDetails
 import linc.com.getme.ui.adapters.selection.ViewHolderWithDetails
+import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.utils.DateFormatUtil
 import linc.com.getme.utils.SizeUtil
 
 class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter.FilesystemEntityViewHolder>() {
 
-    private val filesystemEntities = mutableListOf<FilesystemEntity>()
+    private val filesystemEntityModels = mutableListOf<FilesystemEntityModel>()
+
     private lateinit var filesystemEntityClickListener: FilesystemEntityClickListener
-    private lateinit var selectionTracker: SelectionTracker<FilesystemEntity>
+    private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
 
     fun setFilesystemEntityClickListener(filesystemEntityClickListener: FilesystemEntityClickListener) {
         this.filesystemEntityClickListener = filesystemEntityClickListener
     }
 
-    fun setSelectionTracker(selectionTracker: SelectionTracker<FilesystemEntity>) {
+    fun setSelectionTracker(selectionTracker: SelectionTracker<FilesystemEntityModel>) {
         this.selectionTracker = selectionTracker
     }
 
-    fun updateFilesystemEntities(filesystemEntities: List<FilesystemEntity>) {
-        this.filesystemEntities.clear()
-        this.filesystemEntities.addAll(filesystemEntities)
+    fun updateFilesystemEntities(filesystemEntities: List<FilesystemEntityModel>) {
+        this.filesystemEntityModels.clear()
+        this.filesystemEntityModels.addAll(filesystemEntities)
         notifyDataSetChanged()
     }
 
@@ -40,30 +42,41 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
             .inflate(R.layout.item_filesystem_entity, parent, false)
     )
 
-    override fun getItemCount() = filesystemEntities.count()
+    override fun getItemCount() = filesystemEntityModels.count()
 
     override fun onBindViewHolder(holder: FilesystemEntityViewHolder, position: Int) {
-        val filesystemEntity = filesystemEntities[position]
-        holder.bind(filesystemEntity, false/*selectionTracker.isSelected(filesystemEntity)*/)
+        val filesystemEntity = filesystemEntityModels[position]
+        holder.bind(
+            filesystemEntity,
+            selectionTracker?.isSelected(filesystemEntity) ?: false
+        )
     }
 
     inner class FilesystemEntityViewHolder(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener,
-        ViewHolderWithDetails<FilesystemEntity> {
+        ViewHolderWithDetails<FilesystemEntityModel> {
 
-        fun bind(filesystemEntity: FilesystemEntity, selected: Boolean) {
-            itemView.findViewById<TextView>(R.id.filesystemEntityTitle).text = filesystemEntity.title
+        private var selected: Boolean = false
+
+        fun bind(filesystemEntityModel: FilesystemEntityModel, selected: Boolean) {
+            this.selected = selected
+
+            itemView.findViewById<TextView>(R.id.filesystemEntityTitle).text = filesystemEntityModel.title
+
+            itemView.findViewById<ImageView>(R.id.iconSelected).apply {
+                visibility = if(selected) View.VISIBLE else View.GONE
+            }
 
             itemView.findViewById<TextView>(R.id.filesystemEntityDetails).apply {
-                visibility = if(filesystemEntity.isDirectory) View.GONE else View.VISIBLE
-                text = "${SizeUtil.format(filesystemEntity.size)}, ${DateFormatUtil.formatFromLong(filesystemEntity.lastModified)}"
+                visibility = if(filesystemEntityModel.isDirectory) View.GONE else View.VISIBLE
+                text =  "${filesystemEntityModel.size}, ${filesystemEntityModel.lastModified}"
             }
 
             itemView.findViewById<ImageView>(R.id.filesystemEntityTypeIcon).apply {
                 setImageResource(
-                    if(filesystemEntity.isDirectory)
+                    if(filesystemEntityModel.isDirectory)
                         R.drawable.ic_folder
                     else
                         R.drawable.ic_file
@@ -74,20 +87,21 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
         }
 
         override fun onClick(v: View?) {
-            filesystemEntityClickListener.onClick(filesystemEntities[adapterPosition])
+            if(!selected)
+                filesystemEntityClickListener.onClick(filesystemEntityModels[adapterPosition])
         }
 
-        override fun getItemDetails(): ItemDetailsLookup.ItemDetails<FilesystemEntity> {
+        override fun getItemDetails(): ItemDetailsLookup.ItemDetails<FilesystemEntityModel> {
             return FilesystemEntityDetails(
                 adapterPosition,
-                filesystemEntities[adapterPosition]
+                filesystemEntityModels[adapterPosition]
             )
         }
 
     }
 
     interface FilesystemEntityClickListener {
-        fun onClick(filesystemEntity: FilesystemEntity)
+        fun onClick(filesystemEntityModel: FilesystemEntityModel)
     }
 
 }
