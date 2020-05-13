@@ -51,7 +51,8 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
         val filesystemEntity = filesystemEntityModels[position]
         holder.bind(
             filesystemEntity,
-            selectionTracker?.isSelected(filesystemEntity) ?: false
+            selectionTracker?.isSelected(filesystemEntity) ?: false,
+            selectionTracker?.hasSelection() ?: false
         )
     }
 
@@ -61,11 +62,11 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
         View.OnClickListener,
         ViewHolderWithDetails<FilesystemEntityModel> {
 
-        private var selected: Boolean = false
+        private var selectionMode: Boolean = false
 
-        fun bind(filesystemEntityModel: FilesystemEntityModel, selected: Boolean) {
+        fun bind(filesystemEntityModel: FilesystemEntityModel, selected: Boolean, selectionMode: Boolean) {
 
-            this.selected = selected
+            this.selectionMode = selectionMode
 
             itemView.findViewById<ConstraintLayout>(R.id.filesystemEntityLayout).isSelected = selected
 
@@ -96,7 +97,7 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
         }
 
         override fun onClick(v: View?) {
-            if(!selected)
+            if(!selectionMode)
                 filesystemEntityClickListener.onClick(filesystemEntityModels[adapterPosition])
         }
 
