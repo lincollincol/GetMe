@@ -116,7 +116,7 @@ internal class GetMeFragment : Fragment(),
     override fun closeManager(resultFiles: List<File>) {
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
-//        todo uncomment fragmentManager?.popBackStack()
+        fragmentManager?.popBackStack()
         closeFileManagerCallback.onCloseFileManager()
     }
 

@@ -45,24 +45,26 @@ class MainActivity : AppCompatActivity(),
                 ) {}
             }).check()
 
-        GetMe(
-            supportFragmentManager,
-            R.id.fragmentContainer,
-            this,
-            GetMeFilesystemSettings(
-                actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
+        open.setOnClickListener {
+            GetMe(
+                supportFragmentManager,
+                R.id.fragmentContainer,
+                this,
+                GetMeFilesystemSettings(
+                    actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
 //                mainContent = mutableListOf("pdf", "mp3"),
 //                path = "/storage/emulated/0/viber/media",
 //                allowBackPath = true
-            ),
-            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
-            closeFileManagerCallback = this,
-            fileManagerCompleteCallback = this,
-            selectionTrackerCallback = this,
-            okView = getFiles,
-            backView = back,
-            firstClearSelectionAfterBack = true
-        ).show()
+                ),
+                GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
+                closeFileManagerCallback = this,
+                fileManagerCompleteCallback = this,
+                selectionTrackerCallback = this,
+                okView = getFiles,
+                backView = back,
+                firstClearSelectionAfterBack = true
+            ).show()
+        }
 
     }
 
