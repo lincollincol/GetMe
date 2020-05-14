@@ -8,8 +8,8 @@ class GetMeFilesystemSettings(
     internal val actionType: Int,
     internal val mainContent: MutableList<String>? = null,
     internal val exceptContent: MutableList<String>? = null,
-    internal val path: String? = null,
-    internal val allowBackPath: Boolean = false
+    internal var path: String? = null,
+    internal var allowBackPath: Boolean = false
 ) : Parcelable {
 
     companion object {

@@ -13,6 +13,7 @@ import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
+import linc.com.getme.data.preferences.LocalPreferences
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemInteractor
 import linc.com.getme.domain.utils.StateManager
@@ -54,15 +55,16 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
+
 
         if(presenter == null) {
             presenter = FilesystemPresenter(
                 FilesystemInteractor(
                     StorageHelper(activity!!.applicationContext),
                     StateManager(),
-                    arguments?.getParcelable(KEY_FILESYSTEM_SETTINGS)!!
+                    arguments?.getParcelable(KEY_FILESYSTEM_SETTINGS)!!,
+                    LocalPreferences(activity!!.applicationContext)
                 ),
                 arguments?.getParcelable(KEY_INTERFACE_SETTINGS)!!
             )
@@ -86,9 +88,14 @@ internal class GetMeFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        inflater.inflate(R.layout.fragment_get_me, container, false)
+
+        val style = if(arguments?.getInt("STYLE") != null) {
+            arguments!!.getInt("STYLE")
+        } else R.style.GetMeDefaultTheme
+
+
         val contextThemeWrapper: Context =
-            ContextThemeWrapper(activity, R.style.GetMeDefaultTheme)
+            ContextThemeWrapper(activity, style)
         val localInflater = inflater.cloneInContext(contextThemeWrapper)
         return localInflater.inflate(R.layout.fragment_get_me, container, false)
     }
@@ -105,7 +112,13 @@ internal class GetMeFragment : Fragment(),
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
+//        todo in future presenter?.restoreState()
 
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+//        todo in future presenter?.saveCurrentState()
+        super.onSaveInstanceState(outState)
     }
 
     override fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
@@ -114,10 +127,13 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun closeManager(resultFiles: List<File>) {
+        println("BACK_BACK")
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
-        fragmentManager?.popBackStack()
+//        activity!!.supportFragmentManager.popBackStack()
+//        fragmentManager?.popBackStack()
         closeFileManagerCallback.onCloseFileManager()
+        fragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
 
     override fun enableSelection(enable: Boolean) {
@@ -147,6 +163,11 @@ internal class GetMeFragment : Fragment(),
             return
         }
         presenter?.openPreviousFilesystemEntity()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        println("DESTROY")
     }
 
     /**

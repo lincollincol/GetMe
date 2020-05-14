@@ -8,4 +8,16 @@
         <item name="colorAccent">@color/color_background_circle</item>
         <item name="android:windowBackground">@color/color_background_default</item>
     </style>
+
+
+
+    <style name="GetMeCustomTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="color_background_default">#FFCCB2</item>
+        <item name="color_background_selected">#FFB4A2</item>
+        <item name="color_background_ripple">#B4838D</item>
+        <item name="color_background_circle">#E5989B</item>
+        <item name="color_background_icon">#FFCCB2</item>
+        <item name="color_text">#6D6875</item>
+    </style>
+
 </resources>

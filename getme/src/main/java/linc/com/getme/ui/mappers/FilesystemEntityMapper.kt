@@ -11,8 +11,12 @@ internal class FilesystemEntityMapper {
     companion object {
         fun toFilesystemModelsList(filesystemEntities: List<FilesystemEntity>) =
             mutableListOf<FilesystemEntityModel>().apply {
-                filesystemEntities.forEach {
-                        entity -> add(toFilesystemModel(entity))
+                if(filesystemEntities.isEmpty()) {
+                    emptyList<FilesystemEntityModel>()
+                }else {
+                    filesystemEntities.forEach {
+                            entity -> add(toFilesystemModel(entity))
+                    }
                 }
             }
 

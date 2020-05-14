@@ -5,6 +5,7 @@ import java.util.*
 internal class StateManager {
 
     private val currentPathState = Stack<String>().apply {
+        println("ROOT_PUSH")
         push("root")
     }
 
@@ -18,10 +19,19 @@ internal class StateManager {
 
     fun getLast(): String = currentPathState.peek()
 
+    fun getAllStates(): Stack<String> = currentPathState
+
     fun hasState(): Boolean = !currentPathState.empty()
 
     fun clear() = currentPathState.clear()
 
     fun reverse() = currentPathState.reverse()
+
+    fun copyState(states: Stack<String>) {
+        currentPathState.apply {
+            clear()
+            addAll(states)
+        }
+    }
 
 }

@@ -1,10 +1,9 @@
 package linc.com.getmeexample
 
 import android.Manifest
-import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.PersistableBundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.selection.SelectionTracker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -29,6 +28,8 @@ class MainActivity : AppCompatActivity(),
 
     override lateinit var fileManagerBackListener: FileManagerBackListener
 
+    lateinit var getMe: GetMe<CloseFileManagerCallback>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,27 +46,43 @@ class MainActivity : AppCompatActivity(),
                 ) {}
             }).check()
 
-        open.setOnClickListener {
-            GetMe(
-                supportFragmentManager,
-                R.id.fragmentContainer,
-                this,
-                GetMeFilesystemSettings(
-                    actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
+        getMe = GetMe(
+            supportFragmentManager,
+            R.id.fragmentContainer,
+            this,
+            GetMeFilesystemSettings(
+                actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
 //                mainContent = mutableListOf("pdf", "mp3"),
 //                path = "/storage/emulated/0/viber/media",
 //                allowBackPath = true
-                ),
-                GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
-                closeFileManagerCallback = this,
-                fileManagerCompleteCallback = this,
-                selectionTrackerCallback = this,
-                okView = getFiles,
-                backView = back,
-                firstClearSelectionAfterBack = true
-            ).show()
+            ),
+            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
+            closeFileManagerCallback = this,
+            fileManagerCompleteCallback = this,
+            selectionTrackerCallback = this,
+            okView = getFiles,
+            backView = back,
+            firstClearSelectionAfterBack = true,
+            style = R.style.GetMeCustomTheme
+        )
+
+        println("CREATE")
+
+        open.setOnClickListener {
+            getMe.show()
         }
 
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        getMe.onRestoreInstanceState(savedInstanceState)
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        getMe.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
+        println("SAVE_STATE")
     }
 
     override fun onCloseFileManager() {
@@ -90,100 +107,3 @@ class MainActivity : AppCompatActivity(),
     }
 
 }
-
-/** Dialog fragment*/
-/*class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        Dexter.withActivity(this)
-            .withPermissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ).withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport) {}
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: List<PermissionRequest?>?,
-                    token: PermissionToken?
-                ) {}
-            }).check()
-
-        openFileManager.setOnClickListener {
-            GetMeDialog.newInstance()
-                .show(supportFragmentManager, "GET_ME")
-        }
-    }
-
-}*/
-
-/** Fragment */
-/*
-class MainActivity : AppCompatActivity(), CloseFileManagerCallback {
-
-    override lateinit var filesystemBackListener: FilesystemBackListener
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        Dexter.withActivity(this)
-            .withPermissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ).withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport) {}
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: List<PermissionRequest?>?,
-                    token: PermissionToken?
-                ) {}
-            }).check()
-
-        // Fragment
-        openFileManager.setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(
-                    R.id.fragmentContainer,
-                    GetMeFragment.newInstance(this, this)
-                ).commit()
-        }
-    }
-
-    override fun onCloseFileManager() {
-        super.onBackPressed()
-    }
-
-    override fun onBackPressed() {
-        filesystemBackListener.backPressedInFileManager()
-    }
-
-}*/
-
-/** Activity */
-/*
-class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        Dexter.withActivity(this)
-            .withPermissions(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ).withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport) {}
-                override fun onPermissionRationaleShouldBeShown(
-                    permissions: List<PermissionRequest?>?,
-                    token: PermissionToken?
-                ) {}
-            }).check()
-
-        // Activity
-        openFileManager.setOnClickListener {
-            startActivity(Intent(this, GetMeActivity::class.java))
-        }
-
-    }
-}*/

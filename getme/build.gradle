@@ -44,6 +44,9 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 
+    // Storage
+    implementation "androidx.preference:preference-ktx:1.1.0"
+
     // ReactiveX
     def rx_version = "3.0.0"
     implementation "io.reactivex.rxjava3:rxandroid:$rx_version"

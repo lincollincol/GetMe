@@ -1,5 +1,6 @@
 package linc.com.getme.ui.presenters
 
+import android.content.Context
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import linc.com.getme.domain.entities.FilesystemEntity
@@ -28,6 +29,7 @@ internal class FilesystemPresenter(
     }
 
     fun unbind() {
+        println("STOP")
         this.view = null
     }
 
@@ -61,6 +63,8 @@ internal class FilesystemPresenter(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
+
+                println("IS EMPTY ==== ${it.isEmpty()}")
                 if(it.isEmpty()) {
                     view?.closeManager(emptyList())
                 }else {
@@ -104,4 +108,22 @@ internal class FilesystemPresenter(
             })
     }
 
+    fun saveCurrentState() {
+        interactor.saveState()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
+    }
+
+    fun restoreState() {
+        interactor.restoreState()
+            .map { FilesystemEntityMapper.toFilesystemModelsList(it) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                view?.showFilesystemEntities(it)
+            }, {
+                it.printStackTrace()
+            })
+    }
 }

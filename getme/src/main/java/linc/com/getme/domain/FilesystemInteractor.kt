@@ -1,6 +1,9 @@
 package linc.com.getme.domain
 
+import android.content.Context
+import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import linc.com.getme.data.preferences.LocalPreferences
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
@@ -13,15 +16,30 @@ import java.io.File
 internal class FilesystemInteractor(
     private val storageHelper: StorageHelper,
     private val stateManager: StateManager,
-    private val getMeFilesystemSettings: GetMeFilesystemSettings
+    private val getMeFilesystemSettings: GetMeFilesystemSettings,
+    private val localStorage: LocalFastStorage
 ) {
 
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
 
+            /*stateManager.copyState(localStorage.getStack())
+            todo save state after rotation
+            if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
+                getMeFilesystemSettings.path = stateManager.getLast()
+                getMeFilesystemSettings.allowBackPath = false
+                println("STATE UPDATE RESTORE === ${stateManager.getAllStates()}")
+                localStorage.clearLocalStorage()
+                it.onSuccess(openDirectory(
+                    File(stateManager.getLast())
+                ))
+            }*/
+
+
             if(getMeFilesystemSettings.path != null) {
-                val valid = usePath(getMeFilesystemSettings.path, getMeFilesystemSettings.allowBackPath)
+                val valid = usePath(getMeFilesystemSettings.path as String, getMeFilesystemSettings.allowBackPath)
                 if(valid) {
+                    println("COMPLETE TO ${stateManager.getAllStates()}")
                     it.onSuccess(openDirectory(
                         File(getMeFilesystemSettings.path)
                     ))
@@ -54,7 +72,9 @@ internal class FilesystemInteractor(
     fun openPreviousFilesystemEntity(): Single<List<FilesystemEntity>> {
         return Single.create {
             stateManager.goBack()
-            if(!stateManager.hasState() ) {
+
+            if(!stateManager.hasState()) {
+                println("${stateManager.hasState()} ----->")
                 it.onSuccess(emptyList())
             }else if(stateManager.getLast() == "root") {
                 val filesystemRootEntities = getDeviceStorage()
@@ -74,9 +94,7 @@ internal class FilesystemInteractor(
             val resultFiles = mutableListOf<File>()
 
             filesystemEntities.forEach { entity ->
-                resultFiles.add(
-                    File(entity.path)
-                )
+                resultFiles.add(File(entity.path))
             }
 
             it.onSuccess(resultFiles)
@@ -85,6 +103,61 @@ internal class FilesystemInteractor(
 
     fun prepareResultDirectory(): Single<List<File>> {
         return Single.fromCallable { mutableListOf(File(stateManager.getLast())) }
+    }
+
+    fun saveState(): Completable {
+        return Completable.fromCallable {
+            localStorage.saveStack(stateManager.getAllStates())
+//            localStorage.saveLastPath(stateManager.getLast())
+        }
+    }
+
+    fun restoreState(): Single<List<FilesystemEntity>> {
+        return Single.create {
+
+            /*val valid = usePath(localStorage.getLastPath(), true)
+            if(valid) {
+                localStorage.clearLocalStorage()
+                println(stateManager.getAllStates())
+                it.onSuccess(openDirectory(
+                    File(stateManager.getLast())
+                ))
+            } else {
+                localStorage.clearLocalStorage()
+                it.onError(GetMeInvalidPathException())
+            }
+
+            it.onSuccess(
+                getDeviceStorage()
+                    .filterNotNull()
+                    .map { path -> FilesystemEntity.fromPath(path) }
+            )*/
+
+            stateManager.copyState(localStorage.getStack())
+
+            if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
+                getMeFilesystemSettings.path = stateManager.getLast()
+                getMeFilesystemSettings.allowBackPath = false
+                println("STATE UPDATE === ${stateManager.getAllStates()}")
+            } /*else {
+                getMeFilesystemSettings.path = "root"
+                getMeFilesystemSettings.allowBackPath = false
+            }*/
+
+            /*if(stateManager.getLast() == "root") {
+                it.onSuccess(
+                    getDeviceStorage()
+                        .filterNotNull()
+                        .map { path -> FilesystemEntity.fromPath(path) }
+                )
+                println("1 INTERACT == ${stateManager.getAllStates()}")
+            }else {
+                it.onSuccess(openDirectory(
+                    File(stateManager.getLast())
+                ))
+                println("2 INTERACT == ${stateManager.getAllStates()}")
+            }*/
+        }
     }
 
     /**
@@ -103,15 +176,15 @@ internal class FilesystemInteractor(
     private fun openDirectory(directory: File): List<FilesystemEntity>? {
         val filesystemEntities = hashSetOf<FilesystemEntity>()
 
-
         // Return null if user try to open file. Manager open only directories
         if(directory.isFile) {
             return null
         }
 
+        println("TRY TO OPEN ${directory.name}")
+
         for (fileEntry in directory.listFiles()) {
             if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
-                println("FIRST_IF_${fileEntry.name}")
                 // Add only directories
                 filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 continue
@@ -132,7 +205,6 @@ internal class FilesystemInteractor(
                     if(extension == fileEntry.extension || fileEntry.isDirectory)
                         filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 }
-                println("SECoND_IF_${fileEntry.name}")
                 continue
             }
 
@@ -146,12 +218,9 @@ internal class FilesystemInteractor(
                         file.extension == extension
                     }
                 }
-                println("THIRD_IF_${fileEntry.name}")
             }
 
         }
-
-        println("RETURN === ${filesystemEntities.size}")
 
         return filesystemEntities.toList()
     }
@@ -225,4 +294,5 @@ internal class FilesystemInteractor(
     private fun downgradePath(path: String) = path.apply {
         return dropLast(length - lastIndexOf(File.separator))
     }
+
 }
