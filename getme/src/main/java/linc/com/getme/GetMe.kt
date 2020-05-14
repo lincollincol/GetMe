@@ -73,19 +73,27 @@ class GetMe <T : CloseFileManagerCallback> (
 
 
     fun onSaveInstanceState(outState: Bundle) {
-        println("GET_ME save state =========== is null ${getMeFragment == null}")
+//        println("GET_ME save state =========== is null ${getMeFragment == null}")
 //        fragmentManager.putFragment(outState, "myFragmentName", getMeFragment as Fragment)
-    }
-
-    fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        getMeFragment = fragmentManager.getFragment(savedInstanceState, "myFragmentName") as GetMeFragment
-
         val oldFragment = fragmentManager.findFragmentByTag("GET_ME")
 
         if(oldFragment != null) {
             fragmentManager.beginTransaction().remove(oldFragment).commit()
             println("REMOVE_OLD")
         }
+    }
+
+    fun onRestoreInstanceState(savedInstanceState: Bundle) {
+//        getMeFragment = fragmentManager.getFragment(savedInstanceState, "myFragmentName") as GetMeFragment
+
+        println("COUNT FRAGS ==== ${fragmentManager.fragments.size}")
+
+        /*val oldFragment = fragmentManager.findFragmentByTag("GET_ME")
+
+        if(oldFragment != null) {
+            fragmentManager.beginTransaction().remove(oldFragment).commit()
+            println("REMOVE_OLD")
+        }*/
 
         getMeFragment = GetMeFragment.newInstance(Bundle().apply {
             putParcelable(KEY_FILESYSTEM_SETTINGS, getMeFilesystemSettings)
@@ -110,7 +118,6 @@ class GetMe <T : CloseFileManagerCallback> (
             )
             .addToBackStack(null)
             .commit()
-
     }
 
     /*fun restoreFragmentInstance() {

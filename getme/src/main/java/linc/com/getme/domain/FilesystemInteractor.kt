@@ -23,20 +23,26 @@ internal class FilesystemInteractor(
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
 
-            /*stateManager.copyState(localStorage.getStack())
-            todo save state after rotation
-            if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
-                getMeFilesystemSettings.path = stateManager.getLast()
-                getMeFilesystemSettings.allowBackPath = false
-                println("STATE UPDATE RESTORE === ${stateManager.getAllStates()}")
+//            stateManager.copyState(localStorage.getStack())
+            if(!localStorage.getStack().isNullOrEmpty()) {
+
+                usePath(localStorage.getStack().peek(), true)
                 localStorage.clearLocalStorage()
-                it.onSuccess(openDirectory(
-                    File(stateManager.getLast())
-                ))
-            }*/
+                if(stateManager.getLast() == "root") {
+                    it.onSuccess(
+                        getDeviceStorage()
+                            .filterNotNull()
+                            .map { path -> FilesystemEntity.fromPath(path) }
+                    )
+                } else {
+                    it.onSuccess(openDirectory(
+                        File(stateManager.getLast())
+                    ))
+                }
 
+            }
 
-            if(getMeFilesystemSettings.path != null) {
+            if(getMeFilesystemSettings.path != null && getMeFilesystemSettings.path != "root") {
                 val valid = usePath(getMeFilesystemSettings.path as String, getMeFilesystemSettings.allowBackPath)
                 if(valid) {
                     println("COMPLETE TO ${stateManager.getAllStates()}")
@@ -105,11 +111,8 @@ internal class FilesystemInteractor(
         return Single.fromCallable { mutableListOf(File(stateManager.getLast())) }
     }
 
-    fun saveState(): Completable {
-        return Completable.fromCallable {
-            localStorage.saveStack(stateManager.getAllStates())
-//            localStorage.saveLastPath(stateManager.getLast())
-        }
+    fun saveState() {
+        localStorage.saveStack(stateManager.getAllStates())
     }
 
     fun restoreState(): Single<List<FilesystemEntity>> {
@@ -133,13 +136,13 @@ internal class FilesystemInteractor(
                     .map { path -> FilesystemEntity.fromPath(path) }
             )*/
 
-            stateManager.copyState(localStorage.getStack())
+            /*stateManager.copyState(localStorage.getStack())
 
             if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
                 getMeFilesystemSettings.path = stateManager.getLast()
                 getMeFilesystemSettings.allowBackPath = false
                 println("STATE UPDATE === ${stateManager.getAllStates()}")
-            } /*else {
+            }*/ /*else {
                 getMeFilesystemSettings.path = "root"
                 getMeFilesystemSettings.allowBackPath = false
             }*/
@@ -180,8 +183,6 @@ internal class FilesystemInteractor(
         if(directory.isFile) {
             return null
         }
-
-        println("TRY TO OPEN ${directory.name}")
 
         for (fileEntry in directory.listFiles()) {
             if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
@@ -234,6 +235,16 @@ internal class FilesystemInteractor(
      *      path is invalid: return false emmit onError with mistake message
      * */
     private fun usePath(path: String, allowBackPath: Boolean): Boolean {
+        println("USE PATH ${path}")
+
+        if(path == "root") {
+            stateManager.apply {
+                clear()
+                goTo("root")
+            }
+            return true
+        }
+
         val directory = File(path)
 
         // Check if path is valid
@@ -251,8 +262,10 @@ internal class FilesystemInteractor(
         // If user need back path - rebuild back stack in state manager
         stateManager.clear()
         getDeviceStorage().forEach { root ->
-            // Find root file directory
-            if(root != null && path.contains(root)) {
+            if(root != null && path == root) {
+                // Add sd or mounted storage path if it equals to root
+                stateManager.goTo(path)
+            }else if(root != null && path.contains(root)) { // Find root file directory
                 // Add previous directories to state manager
                 var previousPath: String = path
                 stateManager.goTo(path)

@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity(),
             selectionTrackerCallback = this,
             okView = getFiles,
             backView = back,
-            firstClearSelectionAfterBack = true,
-            style = R.style.GetMeCustomTheme
+            firstClearSelectionAfterBack = true
+//            style = R.style.GetMeCustomTheme
         )
 
         println("CREATE")

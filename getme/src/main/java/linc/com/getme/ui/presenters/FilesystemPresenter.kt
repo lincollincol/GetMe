@@ -110,9 +110,6 @@ internal class FilesystemPresenter(
 
     fun saveCurrentState() {
         interactor.saveState()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe()
     }
 
     fun restoreState() {

@@ -42,7 +42,6 @@ class LocalPreferences(private val context: Context) : LocalFastStorage {
             val jstate = getPreferences().getString("SSS", null)
 
             if(jstate.isNullOrEmpty()) {
-                push("root")
                 return@apply
             }
 

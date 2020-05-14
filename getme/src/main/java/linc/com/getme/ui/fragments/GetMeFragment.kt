@@ -57,7 +57,6 @@ internal class GetMeFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         if(presenter == null) {
             presenter = FilesystemPresenter(
                 FilesystemInteractor(
@@ -74,15 +73,18 @@ internal class GetMeFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
+        println("===========ON_RESUME========== ${this.id}")
         presenter?.bind(this)
         presenter?.getFilesystemEntities()
     }
 
     override fun onStop() {
         super.onStop()
+        println("===========ON_STOP========== ${this.id}")
+        presenter?.saveCurrentState()
         presenter?.unbind()
     }
-
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -112,13 +114,8 @@ internal class GetMeFragment : Fragment(),
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
-//        todo in future presenter?.restoreState()
+//        presenter?.restoreState()
 
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-//        todo in future presenter?.saveCurrentState()
-        super.onSaveInstanceState(outState)
     }
 
     override fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
