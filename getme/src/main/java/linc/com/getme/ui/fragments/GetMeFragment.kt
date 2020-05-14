@@ -89,7 +89,7 @@ internal class GetMeFragment : Fragment(),
         savedInstanceState: Bundle?
     ): View? {
 
-        val style = if(arguments?.getInt("STYLE") != null) {
+        val style = if(arguments?.getInt("STYLE") != -1) {
             arguments!!.getInt("STYLE")
         } else R.style.GetMeDefaultTheme
 
