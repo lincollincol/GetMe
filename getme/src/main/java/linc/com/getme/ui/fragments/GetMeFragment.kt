@@ -2,6 +2,7 @@ package linc.com.getme.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,16 +76,27 @@ internal class GetMeFragment : Fragment(),
         super.onResume()
         println("===========ON_RESUME========== ${this.id}")
         presenter?.bind(this)
-        presenter?.getFilesystemEntities()
     }
 
     override fun onStop() {
         super.onStop()
         println("===========ON_STOP========== ${this.id}")
-        presenter?.saveCurrentState()
         presenter?.unbind()
     }
-    
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt("KEY_STATE", 123)
+        presenter?.saveCurrentState()
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        if(savedInstanceState != null && savedInstanceState.getInt("KEY_STATE") == 123) {
+            presenter?.restoreState()
+        }
+        super.onViewStateRestored(savedInstanceState)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -114,7 +126,7 @@ internal class GetMeFragment : Fragment(),
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
-//        presenter?.restoreState()
+        presenter?.getFilesystemEntities()
 
     }
 
@@ -128,7 +140,7 @@ internal class GetMeFragment : Fragment(),
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
 //        activity!!.supportFragmentManager.popBackStack()
-//        fragmentManager?.popBackStack()
+        fragmentManager?.popBackStack()
         closeFileManagerCallback.onCloseFileManager()
         fragmentManager?.beginTransaction()?.remove(this)?.commit()
     }

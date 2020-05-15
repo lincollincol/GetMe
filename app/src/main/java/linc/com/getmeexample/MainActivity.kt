@@ -82,7 +82,6 @@ class MainActivity : AppCompatActivity(),
     override fun onSaveInstanceState(outState: Bundle) {
         getMe.onSaveInstanceState(outState)
         super.onSaveInstanceState(outState)
-        println("SAVE_STATE")
     }
 
     override fun onCloseFileManager() {

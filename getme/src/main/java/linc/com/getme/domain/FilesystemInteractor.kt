@@ -22,26 +22,6 @@ internal class FilesystemInteractor(
 
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
-
-//            stateManager.copyState(localStorage.getStack())
-            if(!localStorage.getStack().isNullOrEmpty()) {
-
-                usePath(localStorage.getStack().peek(), true)
-                localStorage.clearLocalStorage()
-                if(stateManager.getLast() == "root") {
-                    it.onSuccess(
-                        getDeviceStorage()
-                            .filterNotNull()
-                            .map { path -> FilesystemEntity.fromPath(path) }
-                    )
-                } else {
-                    it.onSuccess(openDirectory(
-                        File(stateManager.getLast())
-                    ))
-                }
-
-            }
-
             if(getMeFilesystemSettings.path != null && getMeFilesystemSettings.path != "root") {
                 val valid = usePath(getMeFilesystemSettings.path as String, getMeFilesystemSettings.allowBackPath)
                 if(valid) {
@@ -117,49 +97,21 @@ internal class FilesystemInteractor(
 
     fun restoreState(): Single<List<FilesystemEntity>> {
         return Single.create {
+//            if(!localStorage.getStack().isNullOrEmpty()) { }
 
-            /*val valid = usePath(localStorage.getLastPath(), true)
-            if(valid) {
-                localStorage.clearLocalStorage()
-                println(stateManager.getAllStates())
-                it.onSuccess(openDirectory(
-                    File(stateManager.getLast())
-                ))
-            } else {
-                localStorage.clearLocalStorage()
-                it.onError(GetMeInvalidPathException())
-            }
-
-            it.onSuccess(
-                getDeviceStorage()
-                    .filterNotNull()
-                    .map { path -> FilesystemEntity.fromPath(path) }
-            )*/
-
-            /*stateManager.copyState(localStorage.getStack())
-
-            if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
-                getMeFilesystemSettings.path = stateManager.getLast()
-                getMeFilesystemSettings.allowBackPath = false
-                println("STATE UPDATE === ${stateManager.getAllStates()}")
-            }*/ /*else {
-                getMeFilesystemSettings.path = "root"
-                getMeFilesystemSettings.allowBackPath = false
-            }*/
-
-            /*if(stateManager.getLast() == "root") {
+            usePath(localStorage.getStack().peek(), true)
+            localStorage.clearLocalStorage()
+            if(stateManager.getLast() == "root") {
                 it.onSuccess(
                     getDeviceStorage()
                         .filterNotNull()
                         .map { path -> FilesystemEntity.fromPath(path) }
                 )
-                println("1 INTERACT == ${stateManager.getAllStates()}")
-            }else {
+            } else {
                 it.onSuccess(openDirectory(
                     File(stateManager.getLast())
                 ))
-                println("2 INTERACT == ${stateManager.getAllStates()}")
-            }*/
+            }
         }
     }
 
