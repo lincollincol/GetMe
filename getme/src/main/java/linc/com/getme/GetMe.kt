@@ -29,99 +29,48 @@ class GetMe <T : CloseFileManagerCallback> (
     @StyleRes private val style: Int = -1
 ) {
 
-    private var getMeFragment: GetMeFragment? = null
-
     fun show() {
-//        restoreFragmentInstance()
-
-        getMeFragment = GetMeFragment.newInstance(Bundle().apply {
-            putParcelable(KEY_FILESYSTEM_SETTINGS, getMeFilesystemSettings)
-            putParcelable(KEY_INTERFACE_SETTINGS, getMeInterfaceSettings.apply {
-                actionType = getMeFilesystemSettings.actionType
-            })
-            putInt("STYLE", style)
-        })
-
-        println("SHOW =========== is null ${getMeFragment == null}")
 
         fragmentManager.beginTransaction()
             .replace(
                 fragmentContainer,
-                getMeFragment.apply {
-                    this?.setParentComponent(parentComponent)
-                    this?.setCloseFileManagerCallback(closeFileManagerCallback)
-                    this?.setFileManagerCompleteCallback(fileManagerCompleteCallback)
-                    if(okView != null) this?.setOkView(okView)
-                    if(backView != null) this?.setBackView(backView, firstClearSelectionAfterBack)
-                    if(selectionTrackerCallback != null) this?.setSelectionCallback(selectionTrackerCallback)
-                } as Fragment,
-                "GET_ME"
-            )
-            .addToBackStack(null)
-            .commit()
-
-        /*
-
-        ?: GetMeFragment.newInstance(Bundle().apply {
+                GetMeFragment.newInstance(Bundle().apply {
                     putParcelable(KEY_FILESYSTEM_SETTINGS, getMeFilesystemSettings)
                     putParcelable(KEY_INTERFACE_SETTINGS, getMeInterfaceSettings.apply {
                         actionType = getMeFilesystemSettings.actionType
                     })
-                })
-         */
+                    putInt("STYLE", style)
+                }).apply {
+                    setParentComponent(parentComponent)
+                    setCloseFileManagerCallback(closeFileManagerCallback)
+                    setFileManagerCompleteCallback(fileManagerCompleteCallback)
+                    if(okView != null) setOkView(okView)
+                    if(backView != null) setBackView(backView, firstClearSelectionAfterBack)
+                    if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback)
+                }
+            )
+            .addToBackStack(null)
+            .commit()
     }
 
 
-    fun onSaveInstanceState(outState: Bundle) {
-        println("GET_ME save state =========== is null ${getMeFragment == null}")
-//        fragmentManager.putFragment(outState, "myFragmentName", getMeFragment as Fragment)
+    fun saveState(outState: Bundle) {
+        fragmentManager.putFragment(
+            outState,
+            "myFragmentName",
+            fragmentManager.findFragmentById(fragmentContainer) as Fragment
+        )
     }
 
-    fun onRestoreInstanceState(savedInstanceState: Bundle) {
-//        getMeFragment = fragmentManager.getFragment(savedInstanceState, "myFragmentName") as GetMeFragment
-
-        val oldFragment = fragmentManager.findFragmentByTag("GET_ME")
-
-        if(oldFragment != null) {
-            fragmentManager.beginTransaction().remove(oldFragment).commit()
-            println("REMOVE_OLD")
-        }
-
-        getMeFragment = GetMeFragment.newInstance(Bundle().apply {
-            putParcelable(KEY_FILESYSTEM_SETTINGS, getMeFilesystemSettings)
-            putParcelable(KEY_INTERFACE_SETTINGS, getMeInterfaceSettings.apply {
-                actionType = getMeFilesystemSettings.actionType
-            })
-            putInt("STYLE", style)
-        })
-
+    fun restoreState(savedInstanceState: Bundle) {
         fragmentManager.beginTransaction()
             .replace(
                 fragmentContainer,
-                getMeFragment.apply {
-                    this?.setParentComponent(parentComponent)
-                    this?.setCloseFileManagerCallback(closeFileManagerCallback)
-                    this?.setFileManagerCompleteCallback(fileManagerCompleteCallback)
-                    if(okView != null) this?.setOkView(okView)
-                    if(backView != null) this?.setBackView(backView, firstClearSelectionAfterBack)
-                    if(selectionTrackerCallback != null) this?.setSelectionCallback(selectionTrackerCallback)
-                } as Fragment,
-                "GET_ME"
+                fragmentManager.getFragment(savedInstanceState, "myFragmentName") as Fragment
             )
             .addToBackStack(null)
             .commit()
 
     }
-
-    /*fun restoreFragmentInstance() {
-        if(instanceState != null) {
-            getMeFragment = fragmentManager.getFragment(instanceState, "myFragmentName") as GetMeFragment
-
-            println("GET_ME RESTORE state =========== is null ${getMeFragment == null}")
-        } else {
-            println("SKIP_RESTORE")
-
-        }
-    }*/
 
 }

@@ -16,32 +16,18 @@ import java.io.File
 internal class FilesystemInteractor(
     private val storageHelper: StorageHelper,
     private val stateManager: StateManager,
-    private val getMeFilesystemSettings: GetMeFilesystemSettings,
-    private val localStorage: LocalFastStorage
+    var getMeFilesystemSettings: GetMeFilesystemSettings? = null
 ) {
 
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
 
-            /*stateManager.copyState(localStorage.getStack())
-            todo save state after rotation
-            if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
-                getMeFilesystemSettings.path = stateManager.getLast()
-                getMeFilesystemSettings.allowBackPath = false
-                println("STATE UPDATE RESTORE === ${stateManager.getAllStates()}")
-                localStorage.clearLocalStorage()
-                it.onSuccess(openDirectory(
-                    File(stateManager.getLast())
-                ))
-            }*/
-
-
-            if(getMeFilesystemSettings.path != null) {
-                val valid = usePath(getMeFilesystemSettings.path as String, getMeFilesystemSettings.allowBackPath)
+            if(getMeFilesystemSettings?.path != null) {
+                val valid = usePath(getMeFilesystemSettings?.path!!, getMeFilesystemSettings!!.allowBackPath)
                 if(valid) {
                     println("COMPLETE TO ${stateManager.getAllStates()}")
                     it.onSuccess(openDirectory(
-                        File(getMeFilesystemSettings.path)
+                        File(getMeFilesystemSettings!!.path)
                     ))
                 } else {
                     it.onError(GetMeInvalidPathException())
@@ -105,61 +91,6 @@ internal class FilesystemInteractor(
         return Single.fromCallable { mutableListOf(File(stateManager.getLast())) }
     }
 
-    fun saveState(): Completable {
-        return Completable.fromCallable {
-            localStorage.saveStack(stateManager.getAllStates())
-//            localStorage.saveLastPath(stateManager.getLast())
-        }
-    }
-
-    fun restoreState(): Single<List<FilesystemEntity>> {
-        return Single.create {
-
-            /*val valid = usePath(localStorage.getLastPath(), true)
-            if(valid) {
-                localStorage.clearLocalStorage()
-                println(stateManager.getAllStates())
-                it.onSuccess(openDirectory(
-                    File(stateManager.getLast())
-                ))
-            } else {
-                localStorage.clearLocalStorage()
-                it.onError(GetMeInvalidPathException())
-            }
-
-            it.onSuccess(
-                getDeviceStorage()
-                    .filterNotNull()
-                    .map { path -> FilesystemEntity.fromPath(path) }
-            )*/
-
-            stateManager.copyState(localStorage.getStack())
-
-            if(stateManager.getAllStates().isNotEmpty() && stateManager.getLast() != "root") {
-                getMeFilesystemSettings.path = stateManager.getLast()
-                getMeFilesystemSettings.allowBackPath = false
-                println("STATE UPDATE === ${stateManager.getAllStates()}")
-            } /*else {
-                getMeFilesystemSettings.path = "root"
-                getMeFilesystemSettings.allowBackPath = false
-            }*/
-
-            /*if(stateManager.getLast() == "root") {
-                it.onSuccess(
-                    getDeviceStorage()
-                        .filterNotNull()
-                        .map { path -> FilesystemEntity.fromPath(path) }
-                )
-                println("1 INTERACT == ${stateManager.getAllStates()}")
-            }else {
-                it.onSuccess(openDirectory(
-                    File(stateManager.getLast())
-                ))
-                println("2 INTERACT == ${stateManager.getAllStates()}")
-            }*/
-        }
-    }
-
     /**
      * @return all storage available in the device
      * @sample
@@ -184,12 +115,12 @@ internal class FilesystemInteractor(
         println("TRY TO OPEN ${directory.name}")
 
         for (fileEntry in directory.listFiles()) {
-            if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
+            if(getMeFilesystemSettings!!.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && fileEntry.isDirectory) {
                 // Add only directories
                 filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 continue
                 // Skip elements if action = select directory
-            } else if(getMeFilesystemSettings.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && !fileEntry.isDirectory)
+            } else if(getMeFilesystemSettings!!.actionType == GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY && !fileEntry.isDirectory)
                 continue
 
 
@@ -200,8 +131,8 @@ internal class FilesystemInteractor(
             //              V                       V
 
             // If user set main content extensions - save directories and all files with this extensions
-            if(!getMeFilesystemSettings.mainContent.isNullOrEmpty()) {
-                getMeFilesystemSettings.mainContent.forEach { extension ->
+            if(!getMeFilesystemSettings?.mainContent.isNullOrEmpty()) {
+                getMeFilesystemSettings!!.mainContent!!.forEach { extension ->
                     if(extension == fileEntry.extension || fileEntry.isDirectory)
                         filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
                 }
@@ -212,8 +143,8 @@ internal class FilesystemInteractor(
             filesystemEntities.add(FilesystemEntity.fromFile(fileEntry))
 
             // If user set except content extensions - remove all files with this extension
-            if(!getMeFilesystemSettings.exceptContent.isNullOrEmpty() && getMeFilesystemSettings.mainContent.isNullOrEmpty()) {
-                getMeFilesystemSettings.exceptContent.forEach { extension ->
+            if(!getMeFilesystemSettings?.exceptContent.isNullOrEmpty() && getMeFilesystemSettings?.mainContent.isNullOrEmpty()) {
+                getMeFilesystemSettings!!.exceptContent!!.forEach { extension ->
                     filesystemEntities.removeAll { file ->
                         file.extension == extension
                     }

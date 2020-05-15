@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
@@ -26,6 +28,8 @@ import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.presenters.FilesystemPresenter
+import linc.com.getme.ui.presenters.FilesystemViewModelFactory
+import linc.com.getme.ui.presenters.ViewModelEvent
 import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
@@ -33,7 +37,6 @@ import java.io.File
 
 
 internal class GetMeFragment : Fragment(),
-    FilesystemView,
     FileManagerBackListener,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
 
@@ -57,30 +60,27 @@ internal class GetMeFragment : Fragment(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        presenter = ViewModelProviders.of(this, FilesystemViewModelFactory(
+            activity!!.applicationContext
+        )).get(FilesystemPresenter::class.java)
 
-        if(presenter == null) {
-            presenter = FilesystemPresenter(
-                FilesystemInteractor(
-                    StorageHelper(activity!!.applicationContext),
-                    StateManager(),
-                    arguments?.getParcelable(KEY_FILESYSTEM_SETTINGS)!!,
-                    LocalPreferences(activity!!.applicationContext)
-                ),
-                arguments?.getParcelable(KEY_INTERFACE_SETTINGS)!!
-            )
-        }
+        presenter?.viewModelData?.observe(this, Observer{ event ->
+            when(event) {
+                is ViewModelEvent.UpdateDataEvent -> showFilesystemEntities(event.data)
+                is ViewModelEvent.UpdateSettingsEvent -> enableSelection(event.selectionEnable)
+                is ViewModelEvent.CloseEvent -> closeManager(event.data)
+            }
+        })
 
     }
 
     override fun onResume() {
         super.onResume()
-        presenter?.bind(this)
+        presenter?.bind(
+            arguments?.getParcelable(KEY_FILESYSTEM_SETTINGS)!!,
+            arguments?.getParcelable(KEY_INTERFACE_SETTINGS)!!
+        )
         presenter?.getFilesystemEntities()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        presenter?.unbind()
     }
 
     override fun onCreateView(
@@ -112,21 +112,14 @@ internal class GetMeFragment : Fragment(),
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
-//        todo in future presenter?.restoreState()
-
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-//        todo in future presenter?.saveCurrentState()
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
+    private fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
         filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntityModels)
         filesystemEntityKeyProvider?.setFilesystemEntities(filesystemEntityModels)
     }
 
-    override fun closeManager(resultFiles: List<File>) {
+    private fun closeManager(resultFiles: List<File>) {
         println("BACK_BACK")
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
@@ -136,7 +129,7 @@ internal class GetMeFragment : Fragment(),
         fragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
 
-    override fun enableSelection(enable: Boolean) {
+    private fun enableSelection(enable: Boolean) {
         if (!enable) return
         filesystemEntityKeyProvider = FilesystemEntityKeyProvider()
 
@@ -153,6 +146,16 @@ internal class GetMeFragment : Fragment(),
         filesystemEntitiesAdapter.setSelectionTracker(selectionTracker!!)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        selectionTracker?.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        selectionTracker?.onRestoreInstanceState(savedInstanceState)
+        super.onActivityCreated(savedInstanceState)
+    }
+
     override fun onClick(filesystemEntityModel: FilesystemEntityModel) {
         presenter?.handleFilesystemEntityAction(filesystemEntityModel)
     }
@@ -163,11 +166,6 @@ internal class GetMeFragment : Fragment(),
             return
         }
         presenter?.openPreviousFilesystemEntity()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        println("DESTROY")
     }
 
     /**

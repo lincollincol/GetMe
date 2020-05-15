@@ -56,14 +56,14 @@ class MainActivity : AppCompatActivity(),
 //                path = "/storage/emulated/0/viber/media",
 //                allowBackPath = true
             ),
-            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
+            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_SINGLE),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,
             selectionTrackerCallback = this,
             okView = getFiles,
             backView = back,
-            firstClearSelectionAfterBack = true,
-            style = R.style.GetMeCustomTheme
+            firstClearSelectionAfterBack = true
+//            style = R.style.GetMeCustomTheme
         )
 
         println("CREATE")
@@ -74,15 +74,14 @@ class MainActivity : AppCompatActivity(),
 
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        getMe.onRestoreInstanceState(savedInstanceState)
-        super.onRestoreInstanceState(savedInstanceState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        getMe.saveState(outState)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        getMe.onSaveInstanceState(outState)
-        super.onSaveInstanceState(outState)
-        println("SAVE_STATE")
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        getMe.restoreState(savedInstanceState)
     }
 
     override fun onCloseFileManager() {
