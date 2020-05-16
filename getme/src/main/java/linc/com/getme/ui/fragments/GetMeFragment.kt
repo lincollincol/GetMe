@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.selection.SelectionPredicates
@@ -29,6 +30,8 @@ import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
+import linc.com.getme.utils.Constants
+import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_FILE_LAYOUT
 import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_STYLE
 import linc.com.getme.utils.Constants.Companion.ID_SELECTION
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
@@ -143,9 +146,15 @@ internal class GetMeFragment : Fragment(),
 
         filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {
             setFilesystemEntityClickListener(this@GetMeFragment)
+            val layout = arguments!!.getInt(Constants.KEY_GET_ME_FILE_LAYOUT)
+            setLayout(
+                if(layout == GET_ME_DEFAULT_FILE_LAYOUT)
+                    R.layout.item_filesystem_entity_get_me
+                else layout
+            )
         }
 
-        filesystemEntities = view.findViewById<RecyclerView>(R.id.filesystemEntities).apply {
+        filesystemEntities = view.findViewById<RecyclerView>(R.id.filesystemEntitiesGetMe).apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)

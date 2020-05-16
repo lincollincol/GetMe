@@ -9,6 +9,7 @@ internal class Constants {
         const val KEY_FILESYSTEM_SETTINGS = "key_settings"
         const val KEY_INTERFACE_SETTINGS = "key_interface"
         const val KEY_GET_ME_STYLE = "key_style"
+        const val KEY_GET_ME_FILE_LAYOUT = "key_file_layout"
 
         const val KEY_RECYCLER_VIEW_STATE = "key_recycler_state"
         const val KEY_SELECTION_STATE = "key_selection_state"
@@ -20,6 +21,7 @@ internal class Constants {
         const val RECYCLER_VIEW_TOP = 0
 
         // Styles
+        const val GET_ME_DEFAULT_FILE_LAYOUT = -1
         const val GET_ME_DEFAULT_STYLE = -1
 
         // Fragment tags

@@ -2,36 +2,25 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/fileLayoutGetMe"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/background_filesystem_entity_get_me"
+    android:layout_height="100dp"
+    android:background="@drawable/background_get_me_item_custom"
     android:clickable="true"
     android:focusable="true"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/fileTypeIconGetMe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginStart="10dp"
-        android:src="@drawable/ic_folder_get_me"
-        android:background="@drawable/background_filesystem_entity_icon_get_me"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/fileTitleGetMe"/>
 
     <ImageView
-        android:id="@+id/fileSelectedIconGetMe"
+        android:id="@+id/myIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_selected_get_me"
-        android:visibility="gone"
-        app:layout_constraintStart_toEndOf="@id/fileTypeIconGetMe"
-        app:layout_constraintEnd_toEndOf="@id/fileTypeIconGetMe"
-        app:layout_constraintBottom_toBottomOf="@id/fileTypeIconGetMe" />
+        android:layout_marginEnd="20dp"
+        android:src="@drawable/ic_attach_file_black_24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/fileTitleGetMe"
+        />
 
     <TextView
         android:id="@+id/fileTitleGetMe"
@@ -41,15 +30,14 @@
         android:layout_marginEnd="10dp"
         android:gravity="center_vertical"
         android:textStyle="bold"
-        android:textSize="15sp"
-        android:textColor="?attr/color_text_get_me"
+        android:textSize="18sp"
         android:text="Android"
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/fileDetailsGetMe"
-        app:layout_constraintStart_toEndOf="@id/fileTypeIconGetMe"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toStartOf="@id/myIcon"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:id="@+id/fileDetailsGetMe"
@@ -58,12 +46,11 @@
         android:layout_marginEnd="10dp"
         android:textSize="13sp"
         android:text="6.12 MB, Apr 24 at 12:36"
-        android:textColor="?attr/color_text_get_me"
-        android:gravity="center_vertical"
-        app:layout_constraintHorizontal_bias="0"
+        android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/fileTitleGetMe"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/fileTitleGetMe"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toStartOf="@id/myIcon"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

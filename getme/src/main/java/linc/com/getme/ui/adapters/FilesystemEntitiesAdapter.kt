@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.SelectionTracker
@@ -20,6 +21,7 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
 
     private lateinit var filesystemEntityClickListener: FilesystemEntityClickListener
     private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
+    @LayoutRes private var itemLayout: Int = -1
 
     fun setFilesystemEntityClickListener(filesystemEntityClickListener: FilesystemEntityClickListener) {
         this.filesystemEntityClickListener = filesystemEntityClickListener
@@ -27,6 +29,10 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
 
     fun setSelectionTracker(selectionTracker: SelectionTracker<FilesystemEntityModel>) {
         this.selectionTracker = selectionTracker
+    }
+
+    fun setLayout(@LayoutRes itemLayout: Int) {
+        this.itemLayout = itemLayout
     }
 
     fun updateFilesystemEntities(filesystemEntities: List<FilesystemEntityModel>) {
@@ -38,8 +44,10 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FilesystemEntityViewHolder(
+//        LayoutInflater.from(parent.context)
+//            .inflate(R.layout.item_filesystem_entity_get_me, parent, false)
         LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_filesystem_entity_get_me, parent, false)
+            .inflate(itemLayout, parent, false)
     )
 
     override fun getItemCount() = filesystemEntityModels.count()
@@ -62,18 +70,17 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
         private var selectionMode: Boolean = false
 
         fun bind(filesystemEntityModel: FilesystemEntityModel, selected: Boolean, selectionMode: Boolean) {
-
             this.selectionMode = selectionMode
 
-            itemView.findViewById<ConstraintLayout>(R.id.filesystemEntityLayout).isSelected = selected
+            itemView.findViewById<ConstraintLayout>(R.id.fileLayoutGetMe).isSelected = selected
 
-            itemView.findViewById<TextView>(R.id.filesystemEntityTitle).text = filesystemEntityModel.title
+            itemView.findViewById<TextView>(R.id.fileTitleGetMe)?.text = filesystemEntityModel.title
 
-            itemView.findViewById<ImageView>(R.id.iconSelected).apply {
+            itemView.findViewById<ImageView>(R.id.fileSelectedIconGetMe)?.apply {
                 visibility = if(selected) View.VISIBLE else View.GONE
             }
 
-            itemView.findViewById<TextView>(R.id.filesystemEntityDetails).apply {
+            itemView.findViewById<TextView>(R.id.fileDetailsGetMe)?.apply {
                 val details = when(filesystemEntityModel.isDirectory) {
                     true -> "Directory"
                     else -> "${filesystemEntityModel.size}, ${filesystemEntityModel.lastModified}"
@@ -81,7 +88,7 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
                 text = details
             }
 
-            itemView.findViewById<ImageView>(R.id.filesystemEntityTypeIcon).apply {
+            itemView.findViewById<ImageView>(R.id.fileTypeIconGetMe)?.apply {
                 setImageResource(
                     if(filesystemEntityModel.isDirectory)
                         R.drawable.ic_folder_get_me
@@ -112,3 +119,62 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
     }
 
 }
+
+
+
+/*
+
+inner class FilesystemEntityViewHolder(
+        itemView: View
+    ) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener,
+        ViewHolderWithDetails<FilesystemEntityModel> {
+
+        private var selectionMode: Boolean = false
+
+        fun bind(filesystemEntityModel: FilesystemEntityModel, selected: Boolean, selectionMode: Boolean) {
+            this.selectionMode = selectionMode
+
+            itemView.findViewById<ConstraintLayout>(R.id.fileLayoutGetMe).isSelected = selected
+
+            itemView.findViewById<TextView>(R.id.fileTitleGetMe).text = filesystemEntityModel.title
+
+            itemView.findViewById<ImageView>(R.id.fileSelectedIconGetMe).apply {
+                visibility = if(selected) View.VISIBLE else View.GONE
+            }
+
+            itemView.findViewById<TextView>(R.id.fileDetailsGetMe).apply {
+                val details = when(filesystemEntityModel.isDirectory) {
+                    true -> "Directory"
+                    else -> "${filesystemEntityModel.size}, ${filesystemEntityModel.lastModified}"
+                }
+                text = details
+            }
+
+            itemView.findViewById<ImageView>(R.id.fileTypeIconGetMe).apply {
+                setImageResource(
+                    if(filesystemEntityModel.isDirectory)
+                        R.drawable.ic_folder_get_me
+                    else
+                        R.drawable.ic_file_get_me
+                )
+            }
+
+            itemView.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            if(!selectionMode)
+                filesystemEntityClickListener.onClick(filesystemEntityModels[adapterPosition])
+        }
+
+        override fun getItemDetails(): ItemDetailsLookup.ItemDetails<FilesystemEntityModel> {
+            return FilesystemEntityDetails(
+                adapterPosition,
+                filesystemEntityModels[adapterPosition]
+            )
+        }
+
+    }
+
+ */

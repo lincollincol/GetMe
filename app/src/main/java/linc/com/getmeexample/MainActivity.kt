@@ -58,9 +58,9 @@ class MainActivity : AppCompatActivity(),
             okView = getFiles,
             backView = back,
             firstClearSelectionAfterBack = true
+//            fileLayout = R.layout.item_get_me_custom
 //            style = R.style.GetMeCustomTheme
         )
-
 
         open.setOnClickListener {
             getMe.show()
@@ -79,7 +79,6 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onBackPressed() {
-//        fileManagerBackListener.backPressedInFileManager()
         getMe.onBackPressed()
     }
 

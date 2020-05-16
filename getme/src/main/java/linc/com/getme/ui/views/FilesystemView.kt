@@ -1,9 +1,7 @@
 package linc.com.getme.ui.views
 
-import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.models.FilesystemEntityModel
 import java.io.File
-
 
 internal interface FilesystemView {
 

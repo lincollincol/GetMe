@@ -2,6 +2,7 @@ package linc.com.getme
 
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.LayoutRes
 import androidx.annotation.StyleRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -11,9 +12,11 @@ import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.fragments.GetMeFragment
+import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_FILE_LAYOUT
 import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
 import linc.com.getme.utils.Constants.Companion.KEY_FRAGMENT_STATE
+import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_FILE_LAYOUT
 import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
 import linc.com.getme.utils.Constants.Companion.TAG_GET_ME
@@ -29,7 +32,8 @@ class GetMe (
     private var okView: View? = null,
     private var backView: View? = null,
     private var firstClearSelectionAfterBack: Boolean = false,
-    @StyleRes private val style: Int = GET_ME_DEFAULT_STYLE
+    @StyleRes private val style: Int = GET_ME_DEFAULT_STYLE,
+    @LayoutRes private val fileLayout: Int = GET_ME_DEFAULT_FILE_LAYOUT
 ) {
 
     fun show() {
@@ -45,6 +49,7 @@ class GetMe (
                         actionType = getMeFilesystemSettings!!.actionType
                     })
                     putInt(KEY_GET_ME_STYLE, style)
+                    putInt(KEY_GET_ME_FILE_LAYOUT, fileLayout)
                 }).apply {
                     setCloseFileManagerCallback(closeFileManagerCallback!!)
                     setFileManagerCompleteCallback(fileManagerCompleteCallback!!)
