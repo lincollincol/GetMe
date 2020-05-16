@@ -12,16 +12,6 @@ import kotlin.collections.ArrayList
 
 class LocalPreferences(private val context: Context) : LocalFastStorage {
 
-
-    override fun saveLastPath(path: String) {
-        getEditor().putString("SSS", path)
-            .apply()
-    }
-
-    override fun getLastPath(): String = getPreferences()
-        .getString("SSS", "root")
-        .toString()
-
     override fun clearLocalStorage() {
         getEditor().remove("SSS")
             .commit()
@@ -29,16 +19,12 @@ class LocalPreferences(private val context: Context) : LocalFastStorage {
 
 
     override fun saveStack(stack: Stack<String>) {
-//        getEditor().remove("SSS").commit()
-        println("______________________SET______________________")
-        println(stack)
         getEditor().putString("SSS", JSONArray(stack.toArray()).toString())
             .commit()
     }
 
     override fun getStack(): Stack<String> {
         return Stack<String>().apply {
-            println("______________________GET______________________")
             val jstate = getPreferences().getString("SSS", null)
 
             if(jstate.isNullOrEmpty()) {
@@ -50,8 +36,6 @@ class LocalPreferences(private val context: Context) : LocalFastStorage {
             for(i in 0 until arr.length()) {
                 push(arr[i] as String)
             }
-
-            println(this)
         }
 
     }

@@ -27,11 +27,4 @@ internal class StateManager {
 
     fun reverse() = currentPathState.reverse()
 
-    fun copyState(states: Stack<String>) {
-        currentPathState.apply {
-            clear()
-            addAll(states)
-        }
-    }
-
 }

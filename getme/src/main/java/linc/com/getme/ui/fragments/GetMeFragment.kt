@@ -2,12 +2,13 @@ package linc.com.getme.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.selection.MutableSelection
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
@@ -21,6 +22,7 @@ import linc.com.getme.domain.utils.StateManager
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.adapters.selection.FilesystemEntityKeyProvider
 import linc.com.getme.ui.adapters.selection.FilesystemEntityLookup
+import linc.com.getme.ui.adapters.selection.SelectionState
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerBackListener
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
@@ -38,16 +40,23 @@ internal class GetMeFragment : Fragment(),
     FileManagerBackListener,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
 
+    // Callbacks
     private lateinit var closeFileManagerCallback: CloseFileManagerCallback
     private lateinit var fileManagerCompleteCallback: FileManagerCompleteCallback
     private lateinit var selectionTrackerCallback: SelectionTrackerCallback
 
-    private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
-    private var filesystemEntityKeyProvider: FilesystemEntityKeyProvider? = null
+    // Mvp
     private var presenter: FilesystemPresenter? = null
 
+    // Ui
+    private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
+    private var filesystemEntityKeyProvider: FilesystemEntityKeyProvider? = null
     private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
     private lateinit var filesystemEntities: RecyclerView
+
+    // States
+    private var recyclerViewState: Parcelable? = null
+    private var selectionState: SelectionState? = null
 
     companion object {
         fun newInstance(data: Bundle) = GetMeFragment().apply {
@@ -69,33 +78,43 @@ internal class GetMeFragment : Fragment(),
                 arguments?.getParcelable(KEY_INTERFACE_SETTINGS)!!
             )
         }
-
     }
 
     override fun onResume() {
         super.onResume()
-        println("===========ON_RESUME========== ${this.id}")
         presenter?.bind(this)
     }
 
     override fun onStop() {
         super.onStop()
-        println("===========ON_STOP========== ${this.id}")
         presenter?.unbind()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable("RV", filesystemEntities.layoutManager!!.onSaveInstanceState())
+        outState.putParcelable("SEL", SelectionState(selectionTracker?.selection!!.toMutableList()))
+
         outState.putInt("KEY_STATE", 123)
         presenter?.saveCurrentState()
         super.onSaveInstanceState(outState)
     }
 
+
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
         if(savedInstanceState != null && savedInstanceState.getInt("KEY_STATE") == 123) {
             presenter?.restoreState()
         }
-        super.onViewStateRestored(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            recyclerViewState = savedInstanceState.getParcelable("RV")!!
+            selectionState = savedInstanceState.getParcelable("SEL")!!
+        }
+
+        savedInstanceState?.clear()
+
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -106,7 +125,6 @@ internal class GetMeFragment : Fragment(),
         val style = if(arguments?.getInt("STYLE") != -1) {
             arguments!!.getInt("STYLE")
         } else R.style.GetMeDefaultTheme
-
 
         val contextThemeWrapper: Context =
             ContextThemeWrapper(activity, style)
@@ -126,6 +144,7 @@ internal class GetMeFragment : Fragment(),
             adapter = filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
+
         presenter?.getFilesystemEntities()
 
     }
@@ -133,22 +152,31 @@ internal class GetMeFragment : Fragment(),
     override fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
         filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntityModels)
         filesystemEntityKeyProvider?.setFilesystemEntities(filesystemEntityModels)
+        if(recyclerViewState != null) {
+            filesystemEntities.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+        }
+        if(selectionState != null) {
+            selectionTracker?.setItemsSelected(selectionState!!.selectedItems, true)
+            selectionState = null
+        }
     }
 
     override fun closeManager(resultFiles: List<File>) {
-        println("BACK_BACK")
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
-//        activity!!.supportFragmentManager.popBackStack()
         fragmentManager?.popBackStack()
         closeFileManagerCallback.onCloseFileManager()
-        fragmentManager?.beginTransaction()?.remove(this)?.commit()
+//        fragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
 
     override fun enableSelection(enable: Boolean) {
         if (!enable) return
-        filesystemEntityKeyProvider = FilesystemEntityKeyProvider()
 
+        if(selectionTracker != null) {
+            return
+        }
+
+        filesystemEntityKeyProvider = FilesystemEntityKeyProvider()
         selectionTracker = SelectionTracker.Builder(
                 "SELECTION_IDDD",
                 filesystemEntities,
@@ -172,11 +200,6 @@ internal class GetMeFragment : Fragment(),
             return
         }
         presenter?.openPreviousFilesystemEntity()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        println("DESTROY")
     }
 
     /**

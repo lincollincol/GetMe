@@ -23,9 +23,8 @@ internal class FilesystemInteractor(
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
             if(getMeFilesystemSettings.path != null && getMeFilesystemSettings.path != "root") {
-                val valid = usePath(getMeFilesystemSettings.path as String, getMeFilesystemSettings.allowBackPath)
+                val valid = usePath(getMeFilesystemSettings.path, getMeFilesystemSettings.allowBackPath)
                 if(valid) {
-                    println("COMPLETE TO ${stateManager.getAllStates()}")
                     it.onSuccess(openDirectory(
                         File(getMeFilesystemSettings.path)
                     ))
@@ -97,8 +96,6 @@ internal class FilesystemInteractor(
 
     fun restoreState(): Single<List<FilesystemEntity>> {
         return Single.create {
-//            if(!localStorage.getStack().isNullOrEmpty()) { }
-
             usePath(localStorage.getStack().peek(), true)
             localStorage.clearLocalStorage()
             if(stateManager.getLast() == "root") {
@@ -187,7 +184,7 @@ internal class FilesystemInteractor(
      *      path is invalid: return false emmit onError with mistake message
      * */
     private fun usePath(path: String, allowBackPath: Boolean): Boolean {
-        println("USE PATH ${path}")
+
 
         if(path == "root") {
             stateManager.apply {
