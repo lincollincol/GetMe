@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.selection.MutableSelection
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import linc.com.getme.R
 import linc.com.getme.data.preferences.LocalPreferences
 import linc.com.getme.device.StorageHelper
@@ -24,20 +24,24 @@ import linc.com.getme.ui.adapters.selection.FilesystemEntityKeyProvider
 import linc.com.getme.ui.adapters.selection.FilesystemEntityLookup
 import linc.com.getme.ui.adapters.selection.SelectionState
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
-import linc.com.getme.ui.callbacks.FileManagerBackListener
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
+import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_STYLE
+import linc.com.getme.utils.Constants.Companion.ID_SELECTION
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
+import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
+import linc.com.getme.utils.Constants.Companion.KEY_RECYCLER_VIEW_STATE
+import linc.com.getme.utils.Constants.Companion.KEY_SELECTION_STATE
+import linc.com.getme.utils.Constants.Companion.RECYCLER_VIEW_TOP
 import java.io.File
 
 
 internal class GetMeFragment : Fragment(),
     FilesystemView,
-    FileManagerBackListener,
     FilesystemEntitiesAdapter.FilesystemEntityClickListener {
 
     // Callbacks
@@ -75,9 +79,11 @@ internal class GetMeFragment : Fragment(),
                     arguments?.getParcelable(KEY_FILESYSTEM_SETTINGS)!!,
                     LocalPreferences(activity!!.applicationContext)
                 ),
-                arguments?.getParcelable(KEY_INTERFACE_SETTINGS)!!
+                arguments?.getParcelable(KEY_INTERFACE_SETTINGS)!!,
+                CompositeDisposable()
             )
         }
+
     }
 
     override fun onResume() {
@@ -91,15 +97,17 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putParcelable("RV", filesystemEntities?.layoutManager?.onSaveInstanceState())
-        outState.putParcelable("SEL",
+        // Save recycler view state
+        outState.putParcelable(KEY_RECYCLER_VIEW_STATE, filesystemEntities?.layoutManager?.onSaveInstanceState())
+        // Save selection state
+        outState.putParcelable(
+            KEY_SELECTION_STATE,
             SelectionState(
             selectionTracker?.selection?.toMutableList()
                 ?: emptyList<FilesystemEntityModel>().toMutableList()
             )
         )
-
-        outState.putInt("KEY_STATE", 123)
+        // Save current directory state
         presenter?.saveCurrentState()
         super.onSaveInstanceState(outState)
     }
@@ -107,13 +115,11 @@ internal class GetMeFragment : Fragment(),
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        if(savedInstanceState != null && savedInstanceState.getInt("KEY_STATE") == 123) {
-            presenter?.restoreState()
-        }
-
         if (savedInstanceState != null) {
-            recyclerViewState = savedInstanceState.getParcelable("RV")!!
-            selectionState = savedInstanceState.getParcelable("SEL")!!
+            // Restore directory state
+            presenter?.restoreState()
+            recyclerViewState = savedInstanceState.getParcelable(KEY_RECYCLER_VIEW_STATE)!!
+            selectionState = savedInstanceState.getParcelable(KEY_SELECTION_STATE)!!
         }
     }
 
@@ -122,13 +128,12 @@ internal class GetMeFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        val style = if(arguments?.getInt("STYLE") != -1) {
-            arguments!!.getInt("STYLE")
+        // Set GetMe style
+        val style = if(arguments?.getInt(KEY_GET_ME_STYLE) != GET_ME_DEFAULT_STYLE) {
+            arguments!!.getInt(KEY_GET_ME_STYLE)
         } else R.style.GetMeDefaultTheme
-
-        val contextThemeWrapper: Context =
-            ContextThemeWrapper(activity, style)
+        // Inflate view
+        val contextThemeWrapper: Context = ContextThemeWrapper(activity, style)
         val localInflater = inflater.cloneInContext(contextThemeWrapper)
         return localInflater.inflate(R.layout.fragment_get_me, container, false)
     }
@@ -165,9 +170,7 @@ internal class GetMeFragment : Fragment(),
     override fun closeManager(resultFiles: List<File>) {
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
-//        fragmentManager?.popBackStack()
         closeFileManagerCallback.onCloseFileManager()
-//        fragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
 
     override fun enableSelection(enable: Boolean) {
@@ -179,7 +182,7 @@ internal class GetMeFragment : Fragment(),
 
         filesystemEntityKeyProvider = FilesystemEntityKeyProvider()
         selectionTracker = SelectionTracker.Builder(
-                "SELECTION_IDDD",
+                ID_SELECTION,
                 filesystemEntities!!,
                 filesystemEntityKeyProvider!!,
                 FilesystemEntityLookup(filesystemEntities!!),
@@ -192,14 +195,14 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun scrollToTop() {
-        filesystemEntities?.scrollToPosition(0)
+        filesystemEntities?.scrollToPosition(RECYCLER_VIEW_TOP)
     }
 
     override fun onClick(filesystemEntityModel: FilesystemEntityModel) {
         presenter?.handleFilesystemEntityAction(filesystemEntityModel)
     }
 
-    override fun backPressedInFileManager() {
+    internal fun backPressedInFileManager() {
         if(selectionTracker?.hasSelection() == true) {
             selectionTracker?.clearSelection()
             return
@@ -211,22 +214,35 @@ internal class GetMeFragment : Fragment(),
      * External callbacks
      */
 
-    fun <T : CloseFileManagerCallback> setParentComponent(parentComponent: T) {
-        parentComponent.fileManagerBackListener = this
-    }
-
+    /**
+     * Call onCloseFileManager() when user press back button from root directory
+     * @param closeFileManagerCallback - implementation from external
+     * */
     fun setCloseFileManagerCallback(closeFileManagerCallback: CloseFileManagerCallback) {
         this.closeFileManagerCallback = closeFileManagerCallback
     }
 
+    /**
+     * Call onFilesSelected(files) when user click okView with selected files
+     * @param fileManagerCompleteCallback - implementation from external
+     * */
     fun setFileManagerCompleteCallback(fileManagerCompleteCallback: FileManagerCompleteCallback) {
         this.fileManagerCompleteCallback = fileManagerCompleteCallback
     }
 
+    /**
+     * Call onSelectionTrackerCreated(selectionTracker) to make library more flexible with selections.
+     * External app can clear or select items with ActionBar etc.
+     * @param selectionTrackerCallback - implementation from external
+     * */
     fun setSelectionCallback(selectionTrackerCallback: SelectionTrackerCallback) {
         this.selectionTrackerCallback = selectionTrackerCallback
     }
 
+    /**
+     * Set external view that will handle click events to return result
+     * @param okView - View that will return result in onFilesSelected(files) after click
+     * */
     fun setOkView(okView: View) {
         okView.setOnClickListener {
             presenter?.prepareResultFiles(
@@ -236,6 +252,11 @@ internal class GetMeFragment : Fragment(),
         }
     }
 
+    /**
+     * Set external view that will handle click events to open previous directory
+     * @param backView - View go to previous directory after click
+     * @param firstClearSelection - in case when it's true - clear selection if external app use selectionTracker
+     * */
     fun setBackView(backView: View, firstClearSelection: Boolean) {
         backView.setOnClickListener {
             if(selectionTracker?.hasSelection() == true) {

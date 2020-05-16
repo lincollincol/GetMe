@@ -3,7 +3,7 @@ package linc.com.getme.utils
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DateFormatUtil {
+internal class DateFormatUtil {
 
     companion object {
         private val fullFormat = SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH)

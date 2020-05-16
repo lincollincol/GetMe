@@ -11,13 +11,16 @@ import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.fragments.GetMeFragment
+import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
+import linc.com.getme.utils.Constants.Companion.KEY_FRAGMENT_STATE
+import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
+import linc.com.getme.utils.Constants.Companion.TAG_GET_ME
 
-class GetMe <T : CloseFileManagerCallback> (
+class GetMe (
     private var fragmentManager: FragmentManager?,
     private var fragmentContainer: Int?,
-    private var parentComponent: T?,
     private var getMeFilesystemSettings: GetMeFilesystemSettings?,
     private var getMeInterfaceSettings: GetMeInterfaceSettings?,
     private var closeFileManagerCallback: CloseFileManagerCallback?,
@@ -26,7 +29,7 @@ class GetMe <T : CloseFileManagerCallback> (
     private var okView: View? = null,
     private var backView: View? = null,
     private var firstClearSelectionAfterBack: Boolean = false,
-    @StyleRes private val style: Int = -1
+    @StyleRes private val style: Int = GET_ME_DEFAULT_STYLE
 ) {
 
     fun show() {
@@ -41,24 +44,22 @@ class GetMe <T : CloseFileManagerCallback> (
                     putParcelable(KEY_INTERFACE_SETTINGS, getMeInterfaceSettings!!.apply {
                         actionType = getMeFilesystemSettings!!.actionType
                     })
-                    putInt("STYLE", style)
+                    putInt(KEY_GET_ME_STYLE, style)
                 }).apply {
-                    setParentComponent(parentComponent!!)
                     setCloseFileManagerCallback(closeFileManagerCallback!!)
                     setFileManagerCompleteCallback(fileManagerCompleteCallback!!)
                     if(okView != null) setOkView(okView!!)
                     if(backView != null) setBackView(backView!!, firstClearSelectionAfterBack)
                     if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback!!)
                 } as Fragment,
-                "GET_ME"
+                TAG_GET_ME
             )
             .addToBackStack(null)
             .commit()
     }
 
     fun close() {
-
-        val getMeFragment = fragmentManager?.findFragmentByTag("GET_ME")
+        val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             fragmentManager!!.beginTransaction()
                 .remove(getMeFragment)
@@ -67,7 +68,6 @@ class GetMe <T : CloseFileManagerCallback> (
 
         fragmentManager = null
         fragmentContainer = null
-        parentComponent = null
         getMeFilesystemSettings = null
         getMeInterfaceSettings = null
         closeFileManagerCallback = null
@@ -80,31 +80,36 @@ class GetMe <T : CloseFileManagerCallback> (
     fun onSaveInstanceState(outState: Bundle) {
         fragmentManager?.putFragment(
             outState,
-            "Frag_KEY",
-            fragmentManager?.findFragmentByTag("GET_ME") as Fragment
+            KEY_FRAGMENT_STATE,
+            fragmentManager?.findFragmentByTag(TAG_GET_ME) as Fragment
         )
-
     }
 
     fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        if(fragmentManager == null) {
+        if(fragmentManager == null || fragmentManager!!.getFragment(savedInstanceState, KEY_FRAGMENT_STATE) == null) {
             return
         }
         fragmentManager!!.beginTransaction()
             .replace(
                 fragmentContainer!!,
-                (fragmentManager!!.getFragment(savedInstanceState, "Frag_KEY") as GetMeFragment).apply {
-                    setParentComponent(parentComponent!!)
+                (fragmentManager!!.getFragment(savedInstanceState, KEY_FRAGMENT_STATE) as GetMeFragment).apply {
                     setCloseFileManagerCallback(closeFileManagerCallback!!)
                     setFileManagerCompleteCallback(fileManagerCompleteCallback!!)
                     if(okView != null) setOkView(okView!!)
                     if(backView != null) setBackView(backView!!, firstClearSelectionAfterBack)
                     if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback!!)
                 },
-                "GET_ME"
+                TAG_GET_ME
             )
             .addToBackStack(null)
             .commit()
+    }
+
+    fun onBackPressed() {
+        val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
+        if(getMeFragment != null) {
+            (getMeFragment as GetMeFragment).backPressedInFileManager()
+        }
     }
 
 }

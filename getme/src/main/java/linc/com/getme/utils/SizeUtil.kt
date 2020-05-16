@@ -1,6 +1,6 @@
 package linc.com.getme.utils
 
-class SizeUtil {
+internal class SizeUtil {
 
     companion object {
 

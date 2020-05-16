@@ -2,7 +2,7 @@ package linc.com.getme.domain
 
 import java.util.*
 
-interface LocalFastStorage {
+internal interface LocalFastStorage {
 
     fun saveStack(stack: Stack<String>)
     fun getStack(): Stack<String>

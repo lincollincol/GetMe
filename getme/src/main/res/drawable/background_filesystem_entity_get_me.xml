@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ripple android:color="?attr/color_background_ripple"
+<ripple android:color="?attr/color_background_ripple_get_me"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <selector>
             <item android:state_selected="false">
                 <shape
                     android:shape="rectangle">
-                    <solid android:color="?attr/color_background_default"/>
+                    <solid android:color="?attr/color_background_default_get_me"/>
                 </shape>
             </item>
 
             <item android:state_selected="true">
                 <shape
                     android:shape="rectangle">
-                    <solid android:color="?attr/color_background_selected"/>
+                    <solid android:color="?attr/color_background_selected_get_me"/>
                 </shape>
             </item>
         </selector>

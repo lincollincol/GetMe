@@ -3,21 +3,21 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/color_background_circle</item>
-        <item name="colorPrimaryDark">@color/color_background_ripple</item>
-        <item name="colorAccent">@color/color_background_circle</item>
-        <item name="android:windowBackground">@color/color_background_default</item>
+        <item name="colorPrimary">@color/color_background_circle_get_me</item>
+        <item name="colorPrimaryDark">@color/color_background_ripple_get_me</item>
+        <item name="colorAccent">@color/color_background_circle_get_me</item>
+        <item name="android:windowBackground">@color/color_background_default_get_me</item>
     </style>
 
 
 
     <style name="GetMeCustomTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="color_background_default">#FFCCB2</item>
-        <item name="color_background_selected">#FFB4A2</item>
-        <item name="color_background_ripple">#B4838D</item>
-        <item name="color_background_circle">#E5989B</item>
-        <item name="color_background_icon">#FFCCB2</item>
-        <item name="color_text">#6D6875</item>
+        <item name="color_background_default_get_me">#FFCCB2</item>
+        <item name="color_background_selected_get_me">#FFB4A2</item>
+        <item name="color_background_ripple_get_me">#B4838D</item>
+        <item name="color_background_circle_get_me">#E5989B</item>
+        <item name="color_background_icon_get_me">#FFCCB2</item>
+        <item name="color_text_get_me">#6D6875</item>
     </style>
 
 </resources>

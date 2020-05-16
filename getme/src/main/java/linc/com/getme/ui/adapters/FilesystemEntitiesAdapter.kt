@@ -10,14 +10,11 @@ import androidx.recyclerview.selection.ItemDetailsLookup
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.R
-import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.adapters.selection.FilesystemEntityDetails
 import linc.com.getme.ui.adapters.selection.ViewHolderWithDetails
 import linc.com.getme.ui.models.FilesystemEntityModel
-import linc.com.getme.utils.DateFormatUtil
-import linc.com.getme.utils.SizeUtil
 
-class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter.FilesystemEntityViewHolder>() {
+internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter.FilesystemEntityViewHolder>() {
 
     private val filesystemEntityModels = mutableListOf<FilesystemEntityModel>()
 
@@ -42,7 +39,7 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FilesystemEntityViewHolder(
         LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_filesystem_entity, parent, false)
+            .inflate(R.layout.item_filesystem_entity_get_me, parent, false)
     )
 
     override fun getItemCount() = filesystemEntityModels.count()
@@ -87,9 +84,9 @@ class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntitiesAdapter
             itemView.findViewById<ImageView>(R.id.filesystemEntityTypeIcon).apply {
                 setImageResource(
                     if(filesystemEntityModel.isDirectory)
-                        R.drawable.ic_folder
+                        R.drawable.ic_folder_get_me
                     else
-                        R.drawable.ic_file
+                        R.drawable.ic_file_get_me
                 )
             }
 

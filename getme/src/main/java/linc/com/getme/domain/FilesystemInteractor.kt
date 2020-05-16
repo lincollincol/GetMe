@@ -21,27 +21,39 @@ internal class FilesystemInteractor(
     private val localStorage: LocalFastStorage
 ) {
 
+    /**
+     * Execute GetMe Lib functional
+     * @return list of directories or files from path or root
+     * */
     fun execute(): Single<List<FilesystemEntity>> {
         return Single.create {
-            if(getMeFilesystemSettings.path != null && getMeFilesystemSettings.path != "root") {
-                val valid = usePath(getMeFilesystemSettings.path, getMeFilesystemSettings.allowBackPath)
+
+            // If user use settings - allow it
+            if(getMeFilesystemSettings.path != null && getMeFilesystemSettings.path != StateManager.ROOT) {
+                val valid = usePath(
+                    getMeFilesystemSettings.path,
+                    getMeFilesystemSettings.allowBackPath
+                )
+                // If directory exist and it is not file - open directory
                 if(valid) {
-                    it.onSuccess(openDirectory(
-                        File(getMeFilesystemSettings.path)
-                    ))
+                    it.onSuccess(openDirectory(File(getMeFilesystemSettings.path)))
                 } else {
                     it.onError(GetMeInvalidPathException())
                 }
             }
 
-            it.onSuccess(
-                getDeviceStorage()
-                    .filterNotNull()
-                    .map { path -> FilesystemEntity.fromPath(path) }
+            // If do not use settings return root directory(-ies)
+            it.onSuccess(getDeviceStorage()
+                .filterNotNull()
+                .map { path -> FilesystemEntity.fromPath(path) }
             )
         }
     }
 
+    /**
+     * Update state and open directory
+     * @return list of files and directories
+     * */
     fun openFilesystemEntity(filesystemEntity: FilesystemEntity): Single<List<FilesystemEntity>> {
         return Single.create {
             val directoryContent = openDirectory(File(filesystemEntity.path))
@@ -55,22 +67,26 @@ internal class FilesystemInteractor(
         }
     }
 
+    /**
+     * Update state and open previous directory
+     * @return list of files and directories from previous directory
+     * */
     fun openPreviousFilesystemEntity(): Single<List<FilesystemEntity>> {
         return Single.create {
             try {
+                // If current directory is not root - open previous directory
                 stateManager.goBack()
             } catch (e: Exception) {
+                // Throw exception if user press back button when GetMe is closed
                 it.onError(GetMeNotFoundException())
             }
 
             if(!stateManager.hasState()) {
                 it.onSuccess(emptyList())
-            }else if(stateManager.getLast() == "root") {
+            }else if(stateManager.getLast() == StateManager.ROOT) {
                 val filesystemRootEntities = getDeviceStorage()
                     .filterNotNull()
-                    .map {
-                        path -> FilesystemEntity.fromPath(path)
-                    }
+                    .map { path -> FilesystemEntity.fromPath(path) }
                 it.onSuccess(filesystemRootEntities)
             }else {
                 it.onSuccess(openDirectory(File(stateManager.getLast())))
@@ -78,37 +94,53 @@ internal class FilesystemInteractor(
         }
     }
 
+    /**
+     * Prepare result directory. If user use ACTION_SELECT_DIRECTORY and click on okView
+     * @return path to selected directory(-ies)
+     * */
     fun prepareResultFiles(filesystemEntities: List<FilesystemEntity>): Single<List<File>> {
         return Single.create {
-            val resultFiles = mutableListOf<File>()
-
-            filesystemEntities.forEach { entity ->
-                resultFiles.add(File(entity.path))
-            }
-
-            it.onSuccess(resultFiles)
+            it.onSuccess(mutableListOf<File>().apply {
+                filesystemEntities.forEach { entity ->
+                    add(File(entity.path))
+                }
+            })
         }
     }
 
+    /**
+     * Prepare result directory. If user use ACTION_SELECT_DIRECTORY and click on okView
+     * @return path to selected directory(-ies)
+     * */
     fun prepareResultDirectory(): Single<List<File>> {
         return Single.fromCallable { mutableListOf(File(stateManager.getLast())) }
     }
 
+    /**
+     * Save current state manager state to local storage
+     * */
     fun saveState() {
         localStorage.saveStack(stateManager.getAllStates())
     }
 
+    /**
+     * Restore state manager state (path to directory)
+     * @return list of files from restored directory
+     * */
     fun restoreState(): Single<List<FilesystemEntity>> {
         return Single.create {
+            // Allow back path for restored directory
             usePath(localStorage.getStack().peek(), true)
+            // Clear storage to avoid restoring the same state
             localStorage.clearLocalStorage()
-            if(stateManager.getLast() == "root") {
-                it.onSuccess(
-                    getDeviceStorage()
-                        .filterNotNull()
-                        .map { path -> FilesystemEntity.fromPath(path) }
+            if(stateManager.getLast() == StateManager.ROOT) {
+                // Return root directory(-ies) if current state is root
+                it.onSuccess(getDeviceStorage()
+                    .filterNotNull()
+                    .map { path -> FilesystemEntity.fromPath(path) }
                 )
             } else {
+                // Return list of files from restored directory
                 it.onSuccess(openDirectory(
                     File(stateManager.getLast())
                 ))
@@ -119,7 +151,7 @@ internal class FilesystemInteractor(
     /**
      * @return all storage available in the device
      * @sample
-     *      ext device(isn't removable): /storage/emulated/0
+     *      mount device(isn't removable): /storage/emulated/0
      *      sd card device(removable): /storage/0000-0000/
      * */
     private fun getDeviceStorage() = mutableListOf<String?>().apply {
@@ -129,6 +161,11 @@ internal class FilesystemInteractor(
         add(storageHelper.getExternalStoragePath(false))
     }
 
+    /**
+     * Open directory and sort by extensions if filesystem settings used
+     * @param directory - directory that will be opened
+     * @return list of files in directory
+     * */
     private fun openDirectory(directory: File): List<FilesystemEntity>? {
         val filesystemEntities = hashSetOf<FilesystemEntity>()
 
@@ -189,11 +226,11 @@ internal class FilesystemInteractor(
      * */
     private fun usePath(path: String, allowBackPath: Boolean): Boolean {
 
-
-        if(path == "root") {
+        // Skip creating back path if root using in the current state
+        if(path == StateManager.ROOT) {
             stateManager.apply {
                 clear()
-                goTo("root")
+                goTo(StateManager.ROOT)
             }
             return true
         }
@@ -232,7 +269,7 @@ internal class FilesystemInteractor(
 
         // Add root and reverse state manager stack because current state is reversed
         stateManager.apply {
-            goTo("root")
+            goTo(StateManager.ROOT)
             reverse()
         }
         // Allow to use path with back path

@@ -2,7 +2,6 @@ package linc.com.getmeexample
 
 import android.Manifest
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.selection.SelectionTracker
 import com.karumi.dexter.Dexter
@@ -15,7 +14,6 @@ import linc.com.getme.GetMe
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
 import linc.com.getme.ui.GetMeInterfaceSettings
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
-import linc.com.getme.ui.callbacks.FileManagerBackListener
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.models.FilesystemEntityModel
@@ -26,9 +24,7 @@ class MainActivity : AppCompatActivity(),
     FileManagerCompleteCallback,
     SelectionTrackerCallback {
 
-    override lateinit var fileManagerBackListener: FileManagerBackListener
-
-    lateinit var getMe: GetMe<CloseFileManagerCallback>
+    lateinit var getMe: GetMe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,10 +45,9 @@ class MainActivity : AppCompatActivity(),
         getMe = GetMe(
             supportFragmentManager,
             R.id.fragmentContainer,
-            this,
             GetMeFilesystemSettings(
                 actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
-//                mainContent = mutableListOf("pdf", "mp3"),
+//                mainContent = mutableListOf("pdf", "mp3")
 //                path = "/storage/emulated/0/viber/media",
 //                allowBackPath = true
             ),
@@ -83,16 +78,16 @@ class MainActivity : AppCompatActivity(),
         super.onSaveInstanceState(outState)
     }
 
+    override fun onBackPressed() {
+//        fileManagerBackListener.backPressedInFileManager()
+        getMe.onBackPressed()
+    }
+
     override fun onCloseFileManager() {
         // Remove GetMe from fragment manager
         getMe.close()
         // todo handle back pressed
     }
-
-    override fun onBackPressed() {
-        fileManagerBackListener.backPressedInFileManager()
-    }
-
     override fun onFilesSelected(selectedFiles: List<File>) {
         println(selectedFiles)
     }

@@ -4,34 +4,34 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import linc.com.getme.domain.LocalFastStorage
+import linc.com.getme.utils.Constants.Companion.KEY_STACK_STATE
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class LocalPreferences(private val context: Context) : LocalFastStorage {
+internal class LocalPreferences(private val context: Context) : LocalFastStorage {
 
     override fun clearLocalStorage() {
-        getEditor().remove("SSS")
+        getEditor().remove(KEY_STACK_STATE)
             .commit()
     }
 
-
     override fun saveStack(stack: Stack<String>) {
-        getEditor().putString("SSS", JSONArray(stack.toArray()).toString())
+        getEditor().putString(KEY_STACK_STATE, JSONArray(stack.toArray()).toString())
             .commit()
     }
 
     override fun getStack(): Stack<String> {
         return Stack<String>().apply {
-            val jstate = getPreferences().getString("SSS", null)
+            val jsonStates = getPreferences().getString(KEY_STACK_STATE, null)
 
-            if(jstate.isNullOrEmpty()) {
+            if(jsonStates.isNullOrEmpty()) {
                 return@apply
             }
 
-            val arr = JSONArray(jstate)
+            val arr = JSONArray(jsonStates)
 
             for(i in 0 until arr.length()) {
                 push(arr[i] as String)
@@ -39,7 +39,6 @@ class LocalPreferences(private val context: Context) : LocalFastStorage {
         }
 
     }
-
 
     private fun getEditor(): SharedPreferences.Editor {
         return PreferenceManager

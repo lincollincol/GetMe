@@ -2,12 +2,12 @@
 <resources>
 
     <style name="GetMeDefaultTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="color_background_default">@color/color_background_default</item>
-        <item name="color_background_selected">@color/color_background_selected</item>
-        <item name="color_background_ripple">@color/color_background_ripple</item>
-        <item name="color_background_circle">@color/color_background_circle</item>
-        <item name="color_background_icon">@color/color_background_icon</item>
-        <item name="color_text">@color/color_text</item>
+        <item name="color_background_default_get_me">@color/color_background_default_get_me</item>
+        <item name="color_background_selected_get_me">@color/color_background_selected_get_me</item>
+        <item name="color_background_ripple_get_me">@color/color_background_ripple_get_me</item>
+        <item name="color_background_circle_get_me">@color/color_background_circle_get_me</item>
+        <item name="color_background_icon_get_me">@color/color_background_icon_get_me</item>
+        <item name="color_text_get_me">@color/color_text_get_me</item>
     </style>
 
 </resources>

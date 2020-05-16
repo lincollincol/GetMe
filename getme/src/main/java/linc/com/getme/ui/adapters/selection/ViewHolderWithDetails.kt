@@ -2,6 +2,6 @@ package linc.com.getme.ui.adapters.selection
 
 import androidx.recyclerview.selection.ItemDetailsLookup
 
-interface ViewHolderWithDetails <T> {
+internal interface ViewHolderWithDetails <T> {
     fun getItemDetails(): ItemDetailsLookup.ItemDetails<T>
 }

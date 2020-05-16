@@ -4,7 +4,7 @@ import androidx.recyclerview.selection.ItemDetailsLookup
 import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.models.FilesystemEntityModel
 
-class FilesystemEntityDetails(
+internal class FilesystemEntityDetails(
     private val position: Int,
     private val selectionKey: FilesystemEntityModel
 ) : ItemDetailsLookup.ItemDetails<FilesystemEntityModel>() {

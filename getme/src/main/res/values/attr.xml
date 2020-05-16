@@ -2,14 +2,14 @@
 <resources>
 
     <!-- Item filesystem entity background attrs  -->
-    <attr name="color_background_default" format="color"/>
-    <attr name="color_background_selected" format="color"/>
-    <attr name="color_background_ripple" format="color"/>
+    <attr name="color_background_default_get_me" format="color"/>
+    <attr name="color_background_selected_get_me" format="color"/>
+    <attr name="color_background_ripple_get_me" format="color"/>
 
     <!-- Filesystem entity type icon attrs-->
-    <attr name="color_background_circle" format="color"/>
-    <attr name="color_background_icon" format="color"/>
+    <attr name="color_background_circle_get_me" format="color"/>
+    <attr name="color_background_icon_get_me" format="color"/>
 
-    <attr name="color_text" format="color"/>
+    <attr name="color_text_get_me" format="color"/>
 
 </resources>

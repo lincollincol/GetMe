@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.ui.models.FilesystemEntityModel
 
-class FilesystemEntityLookup(
+internal class FilesystemEntityLookup(
     private val recyclerView: RecyclerView
 ) : ItemDetailsLookup<FilesystemEntityModel>() {
     override fun getItemDetails(e: MotionEvent): ItemDetails<FilesystemEntityModel>? {

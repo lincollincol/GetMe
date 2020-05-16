@@ -5,7 +5,7 @@ import java.util.*
 internal class StateManager {
 
     private val currentPathState = Stack<String>().apply {
-        push("root")
+        push(ROOT)
     }
 
     fun goTo(path: String) {
@@ -26,4 +26,8 @@ internal class StateManager {
 
     fun reverse() = currentPathState.reverse()
 
+
+    companion object {
+        const val ROOT = "root"
+    }
 }
