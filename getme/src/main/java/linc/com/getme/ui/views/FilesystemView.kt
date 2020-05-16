@@ -10,6 +10,6 @@ internal interface FilesystemView {
     fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>)
     fun closeManager(resultFiles: List<File>)
 
-
     fun enableSelection(enable: Boolean)
+    fun scrollToTop()
 }

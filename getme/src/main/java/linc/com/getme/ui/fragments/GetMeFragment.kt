@@ -110,11 +110,7 @@ internal class GetMeFragment : Fragment(),
             recyclerViewState = savedInstanceState.getParcelable("RV")!!
             selectionState = savedInstanceState.getParcelable("SEL")!!
         }
-
-        savedInstanceState?.clear()
-
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -188,6 +184,10 @@ internal class GetMeFragment : Fragment(),
 
         selectionTrackerCallback.onSelectionTrackerCreated(selectionTracker!!)
         filesystemEntitiesAdapter.setSelectionTracker(selectionTracker!!)
+    }
+
+    override fun scrollToTop() {
+        filesystemEntities.scrollToPosition(0)
     }
 
     override fun onClick(filesystemEntityModel: FilesystemEntityModel) {

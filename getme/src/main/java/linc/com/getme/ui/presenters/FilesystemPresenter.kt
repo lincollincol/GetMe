@@ -29,7 +29,6 @@ internal class FilesystemPresenter(
     }
 
     fun unbind() {
-        println("STOP")
         this.view = null
     }
 
@@ -69,6 +68,7 @@ internal class FilesystemPresenter(
                     view?.closeManager(emptyList())
                 }else {
                     view?.showFilesystemEntities(it)
+                    view?.scrollToTop()
                 }
 
             }, {
