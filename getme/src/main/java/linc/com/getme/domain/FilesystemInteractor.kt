@@ -8,6 +8,7 @@ import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
 import linc.com.getme.domain.utils.GetMeInvalidPathException
+import linc.com.getme.domain.utils.GetMeNotFoundException
 import linc.com.getme.domain.utils.StateManager
 import linc.com.getme.ui.models.FilesystemEntityModel
 
@@ -56,10 +57,13 @@ internal class FilesystemInteractor(
 
     fun openPreviousFilesystemEntity(): Single<List<FilesystemEntity>> {
         return Single.create {
-            stateManager.goBack()
+            try {
+                stateManager.goBack()
+            } catch (e: Exception) {
+                it.onError(GetMeNotFoundException())
+            }
 
             if(!stateManager.hasState()) {
-                println("${stateManager.hasState()} ----->")
                 it.onSuccess(emptyList())
             }else if(stateManager.getLast() == "root") {
                 val filesystemRootEntities = getDeviceStorage()

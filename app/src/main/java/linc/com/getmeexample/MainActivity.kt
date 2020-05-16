@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity(),
 //            style = R.style.GetMeCustomTheme
         )
 
-        println("CREATE")
 
         open.setOnClickListener {
             getMe.show()
@@ -75,8 +74,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        getMe.onRestoreInstanceState(savedInstanceState)
         super.onRestoreInstanceState(savedInstanceState)
+        getMe.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -85,6 +84,8 @@ class MainActivity : AppCompatActivity(),
     }
 
     override fun onCloseFileManager() {
+        // Remove GetMe from fragment manager
+        getMe.close()
         // todo handle back pressed
     }
 

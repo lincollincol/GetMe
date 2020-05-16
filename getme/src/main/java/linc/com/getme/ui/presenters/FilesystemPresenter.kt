@@ -62,8 +62,6 @@ internal class FilesystemPresenter(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-
-                println("IS EMPTY ==== ${it.isEmpty()}")
                 if(it.isEmpty()) {
                     view?.closeManager(emptyList())
                 }else {
@@ -90,7 +88,6 @@ internal class FilesystemPresenter(
     }
 
     fun prepareResultFiles(filesystemEntityModels: List<FilesystemEntityModel>) {
-
         val resultSingle = when(getMeInterfaceSettings.actionType) {
             GetMeFilesystemSettings.ACTION_SELECT_DIRECTORY -> interactor.prepareResultDirectory()
             else -> interactor.prepareResultFiles(

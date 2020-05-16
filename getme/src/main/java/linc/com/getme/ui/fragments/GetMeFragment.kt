@@ -52,7 +52,7 @@ internal class GetMeFragment : Fragment(),
     private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
     private var filesystemEntityKeyProvider: FilesystemEntityKeyProvider? = null
     private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
-    private lateinit var filesystemEntities: RecyclerView
+    private var filesystemEntities: RecyclerView? = null
 
     // States
     private var recyclerViewState: Parcelable? = null
@@ -91,8 +91,13 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putParcelable("RV", filesystemEntities.layoutManager!!.onSaveInstanceState())
-        outState.putParcelable("SEL", SelectionState(selectionTracker?.selection!!.toMutableList()))
+        outState.putParcelable("RV", filesystemEntities?.layoutManager?.onSaveInstanceState())
+        outState.putParcelable("SEL",
+            SelectionState(
+            selectionTracker?.selection?.toMutableList()
+                ?: emptyList<FilesystemEntityModel>().toMutableList()
+            )
+        )
 
         outState.putInt("KEY_STATE", 123)
         presenter?.saveCurrentState()
@@ -149,7 +154,7 @@ internal class GetMeFragment : Fragment(),
         filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntityModels)
         filesystemEntityKeyProvider?.setFilesystemEntities(filesystemEntityModels)
         if(recyclerViewState != null) {
-            filesystemEntities.layoutManager!!.onRestoreInstanceState(recyclerViewState)
+            filesystemEntities?.layoutManager!!.onRestoreInstanceState(recyclerViewState)
         }
         if(selectionState != null) {
             selectionTracker?.setItemsSelected(selectionState!!.selectedItems, true)
@@ -160,7 +165,7 @@ internal class GetMeFragment : Fragment(),
     override fun closeManager(resultFiles: List<File>) {
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
-        fragmentManager?.popBackStack()
+//        fragmentManager?.popBackStack()
         closeFileManagerCallback.onCloseFileManager()
 //        fragmentManager?.beginTransaction()?.remove(this)?.commit()
     }
@@ -175,9 +180,9 @@ internal class GetMeFragment : Fragment(),
         filesystemEntityKeyProvider = FilesystemEntityKeyProvider()
         selectionTracker = SelectionTracker.Builder(
                 "SELECTION_IDDD",
-                filesystemEntities,
+                filesystemEntities!!,
                 filesystemEntityKeyProvider!!,
-                FilesystemEntityLookup(filesystemEntities),
+                FilesystemEntityLookup(filesystemEntities!!),
                 StorageStrategy.createParcelableStorage(FilesystemEntityModel::class.java)
             ).withSelectionPredicate(SelectionPredicates.createSelectAnything())
             .build()
@@ -187,7 +192,7 @@ internal class GetMeFragment : Fragment(),
     }
 
     override fun scrollToTop() {
-        filesystemEntities.scrollToPosition(0)
+        filesystemEntities?.scrollToPosition(0)
     }
 
     override fun onClick(filesystemEntityModel: FilesystemEntityModel) {

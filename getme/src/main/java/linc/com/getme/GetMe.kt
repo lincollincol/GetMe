@@ -15,37 +15,40 @@ import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
 
 class GetMe <T : CloseFileManagerCallback> (
-    private val fragmentManager: FragmentManager,
-    private val fragmentContainer: Int,
-    private val parentComponent: T,
-    private val getMeFilesystemSettings: GetMeFilesystemSettings,
-    private val getMeInterfaceSettings: GetMeInterfaceSettings,
-    private val closeFileManagerCallback: CloseFileManagerCallback,
-    private val fileManagerCompleteCallback: FileManagerCompleteCallback,
-    private val selectionTrackerCallback: SelectionTrackerCallback? = null,
-    private val okView: View? = null,
-    private val backView: View? = null,
-    private val firstClearSelectionAfterBack: Boolean = false,
+    private var fragmentManager: FragmentManager?,
+    private var fragmentContainer: Int?,
+    private var parentComponent: T?,
+    private var getMeFilesystemSettings: GetMeFilesystemSettings?,
+    private var getMeInterfaceSettings: GetMeInterfaceSettings?,
+    private var closeFileManagerCallback: CloseFileManagerCallback?,
+    private var fileManagerCompleteCallback: FileManagerCompleteCallback?,
+    private var selectionTrackerCallback: SelectionTrackerCallback? = null,
+    private var okView: View? = null,
+    private var backView: View? = null,
+    private var firstClearSelectionAfterBack: Boolean = false,
     @StyleRes private val style: Int = -1
 ) {
 
     fun show() {
-        fragmentManager.beginTransaction()
+        if(fragmentManager == null) {
+            return
+        }
+        fragmentManager!!.beginTransaction()
             .replace(
-                fragmentContainer,
+                fragmentContainer!!,
                 GetMeFragment.newInstance(Bundle().apply {
                     putParcelable(KEY_FILESYSTEM_SETTINGS, getMeFilesystemSettings)
-                    putParcelable(KEY_INTERFACE_SETTINGS, getMeInterfaceSettings.apply {
-                        actionType = getMeFilesystemSettings.actionType
+                    putParcelable(KEY_INTERFACE_SETTINGS, getMeInterfaceSettings!!.apply {
+                        actionType = getMeFilesystemSettings!!.actionType
                     })
                     putInt("STYLE", style)
                 }).apply {
-                    setParentComponent(parentComponent)
-                    setCloseFileManagerCallback(closeFileManagerCallback)
-                    setFileManagerCompleteCallback(fileManagerCompleteCallback)
-                    if(okView != null) setOkView(okView)
-                    if(backView != null) setBackView(backView, firstClearSelectionAfterBack)
-                    if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback)
+                    setParentComponent(parentComponent!!)
+                    setCloseFileManagerCallback(closeFileManagerCallback!!)
+                    setFileManagerCompleteCallback(fileManagerCompleteCallback!!)
+                    if(okView != null) setOkView(okView!!)
+                    if(backView != null) setBackView(backView!!, firstClearSelectionAfterBack)
+                    if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback!!)
                 } as Fragment,
                 "GET_ME"
             )
@@ -53,27 +56,50 @@ class GetMe <T : CloseFileManagerCallback> (
             .commit()
     }
 
+    fun close() {
+
+        val getMeFragment = fragmentManager?.findFragmentByTag("GET_ME")
+        if(getMeFragment != null) {
+            fragmentManager!!.beginTransaction()
+                .remove(getMeFragment)
+                .commit()
+        }
+
+        fragmentManager = null
+        fragmentContainer = null
+        parentComponent = null
+        getMeFilesystemSettings = null
+        getMeInterfaceSettings = null
+        closeFileManagerCallback = null
+        fileManagerCompleteCallback = null
+        selectionTrackerCallback = null
+        okView = null
+        backView = null
+    }
 
     fun onSaveInstanceState(outState: Bundle) {
-        fragmentManager.putFragment(
+        fragmentManager?.putFragment(
             outState,
             "Frag_KEY",
-            fragmentManager.findFragmentByTag("GET_ME") as Fragment
+            fragmentManager?.findFragmentByTag("GET_ME") as Fragment
         )
 
     }
 
     fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        fragmentManager.beginTransaction()
+        if(fragmentManager == null) {
+            return
+        }
+        fragmentManager!!.beginTransaction()
             .replace(
-                fragmentContainer,
-                (fragmentManager.getFragment(savedInstanceState, "Frag_KEY") as GetMeFragment).apply {
-                    setParentComponent(parentComponent)
-                    setCloseFileManagerCallback(closeFileManagerCallback)
-                    setFileManagerCompleteCallback(fileManagerCompleteCallback)
-                    if(okView != null) setOkView(okView)
-                    if(backView != null) setBackView(backView, firstClearSelectionAfterBack)
-                    if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback)
+                fragmentContainer!!,
+                (fragmentManager!!.getFragment(savedInstanceState, "Frag_KEY") as GetMeFragment).apply {
+                    setParentComponent(parentComponent!!)
+                    setCloseFileManagerCallback(closeFileManagerCallback!!)
+                    setFileManagerCompleteCallback(fileManagerCompleteCallback!!)
+                    if(okView != null) setOkView(okView!!)
+                    if(backView != null) setBackView(backView!!, firstClearSelectionAfterBack)
+                    if(selectionTrackerCallback != null) setSelectionCallback(selectionTrackerCallback!!)
                 },
                 "GET_ME"
             )

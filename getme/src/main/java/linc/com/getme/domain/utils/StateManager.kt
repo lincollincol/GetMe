@@ -5,7 +5,6 @@ import java.util.*
 internal class StateManager {
 
     private val currentPathState = Stack<String>().apply {
-        println("ROOT_PUSH")
         push("root")
     }
 
