@@ -48,7 +48,9 @@ class ExampleGetMeActivity : AppCompatActivity(),
             firstClearSelectionAfterBack = true
         )
 
-        getMe.show()
+        if(savedInstanceState == null) {
+            getMe.show()
+        }
 
     }
 

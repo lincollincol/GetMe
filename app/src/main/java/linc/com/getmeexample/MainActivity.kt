@@ -33,21 +33,28 @@ class MainActivity : AppCompatActivity() {
             }).check()
 
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, StartFragment())
-            .commit()
+        if(savedInstanceState == null) {
+            startActivity(Intent(this, ExampleGetMeActivity::class.java))
+        }
+
+
+        /*if(savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, StartFragment())
+                .commit()
+        }*/
 
     }
 
+    /*
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, supportFragmentManager.getFragment(savedInstanceState, "FRA")!!)
             .commit()
-
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
+   override fun onSaveInstanceState(outState: Bundle) {
         supportFragmentManager.putFragment(
             outState,
             "FRA",
@@ -66,5 +73,5 @@ class MainActivity : AppCompatActivity() {
         if(fragment != null && fragment is FileManagerFragment)
             fragment.onBackPressed()
     }
-
+    */
 }
