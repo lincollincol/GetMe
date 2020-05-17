@@ -6,7 +6,6 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.selection.SelectionPredicates
@@ -147,10 +146,12 @@ internal class GetMeFragment : Fragment(),
         filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {
             setFilesystemEntityClickListener(this@GetMeFragment)
             val layout = arguments!!.getInt(Constants.KEY_GET_ME_FILE_LAYOUT)
+            // Set adapter item layout
             setLayout(
-                if(layout == GET_ME_DEFAULT_FILE_LAYOUT)
-                    R.layout.item_filesystem_entity_get_me
-                else layout
+                when(layout) {
+                    GET_ME_DEFAULT_FILE_LAYOUT -> R.layout.item_filesystem_entity_get_me
+                    else -> layout
+                }
             )
         }
 
@@ -211,14 +212,6 @@ internal class GetMeFragment : Fragment(),
         presenter?.handleFilesystemEntityAction(filesystemEntityModel)
     }
 
-    internal fun backPressedInFileManager() {
-        if(selectionTracker?.hasSelection() == true) {
-            selectionTracker?.clearSelection()
-            return
-        }
-        presenter?.openPreviousFilesystemEntity()
-    }
-
     /**
      * External callbacks
      */
@@ -253,12 +246,7 @@ internal class GetMeFragment : Fragment(),
      * @param okView - View that will return result in onFilesSelected(files) after click
      * */
     fun setOkView(okView: View) {
-        okView.setOnClickListener {
-            presenter?.prepareResultFiles(
-                selectionTracker?.selection?.toList() ?: emptyList()
-            )
-            selectionTracker?.clearSelection()
-        }
+        okView.setOnClickListener { okClicked() }
     }
 
     /**
@@ -267,13 +255,43 @@ internal class GetMeFragment : Fragment(),
      * @param firstClearSelection - in case when it's true - clear selection if external app use selectionTracker
      * */
     fun setBackView(backView: View, firstClearSelection: Boolean) {
-        backView.setOnClickListener {
-            if(selectionTracker?.hasSelection() == true) {
-                selectionTracker?.clearSelection()
-                if(firstClearSelection) return@setOnClickListener
-            }
-            presenter?.openPreviousFilesystemEntity()
+        backView.setOnClickListener { backClicked(firstClearSelection) }
+    }
+
+    /**
+     * Internal implementation
+     * */
+
+    /**
+     * Execute ok click functional
+     * */
+    internal fun okClicked() {
+        presenter?.prepareResultFiles(
+            selectionTracker?.selection?.toList() ?: emptyList()
+        )
+        selectionTracker?.clearSelection()
+    }
+
+    /**
+     * Execute back click functional
+     * */
+    internal fun backClicked(clearSelection: Boolean) {
+        if(selectionTracker?.hasSelection() == true) {
+            selectionTracker?.clearSelection()
+            if(clearSelection) return
         }
+        presenter?.openPreviousFilesystemEntity()
+    }
+
+    /**
+     * Execute back pressed functional
+     * */
+    internal fun backPressedInFileManager() {
+        if(selectionTracker?.hasSelection() == true) {
+            selectionTracker?.clearSelection()
+            return
+        }
+        presenter?.openPreviousFilesystemEntity()
     }
 
 }

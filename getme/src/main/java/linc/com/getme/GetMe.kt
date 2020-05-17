@@ -29,13 +29,16 @@ class GetMe (
     private var closeFileManagerCallback: CloseFileManagerCallback?,
     private var fileManagerCompleteCallback: FileManagerCompleteCallback?,
     private var selectionTrackerCallback: SelectionTrackerCallback? = null,
-    private var okView: View? = null,
-    private var backView: View? = null,
-    private var firstClearSelectionAfterBack: Boolean = false,
-    @StyleRes private val style: Int = GET_ME_DEFAULT_STYLE,
-    @LayoutRes private val fileLayout: Int = GET_ME_DEFAULT_FILE_LAYOUT
+    var okView: View? = null,
+    var backView: View? = null,
+    var firstClearSelectionAfterBack: Boolean = false,
+    @StyleRes var style: Int = GET_ME_DEFAULT_STYLE,
+    @LayoutRes var fileLayout: Int = GET_ME_DEFAULT_FILE_LAYOUT
 ) {
 
+    /**
+     * Create GetMe and start it in the fragment manager
+     * */
     fun show() {
         if(fragmentManager == null) {
             return
@@ -63,12 +66,13 @@ class GetMe (
             .commit()
     }
 
+    /**
+     * Remove GetMe from back stack and clear references
+     * */
     fun close() {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
-            fragmentManager!!.beginTransaction()
-                .remove(getMeFragment)
-                .commit()
+            fragmentManager!!.popBackStack()
         }
 
         fragmentManager = null
@@ -82,6 +86,9 @@ class GetMe (
         backView = null
     }
 
+    /**
+     * Handle GetMe instance saving
+     * */
     fun onSaveInstanceState(outState: Bundle) {
         fragmentManager?.putFragment(
             outState,
@@ -90,6 +97,9 @@ class GetMe (
         )
     }
 
+    /**
+     * Handle GetMe instance restoring
+     * */
     fun onRestoreInstanceState(savedInstanceState: Bundle) {
         if(fragmentManager == null || fragmentManager!!.getFragment(savedInstanceState, KEY_FRAGMENT_STATE) == null) {
             return
@@ -110,10 +120,33 @@ class GetMe (
             .commit()
     }
 
+    /**
+     * Handle back press in GetMe
+     * */
     fun onBackPressed() {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             (getMeFragment as GetMeFragment).backPressedInFileManager()
+        }
+    }
+
+    /**
+     * Provoke ok click if user need it without okView etc. Make GetMe more flexible
+     * */
+    fun provokeOkClick() {
+        val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
+        if(getMeFragment != null) {
+            (getMeFragment as GetMeFragment).okClicked()
+        }
+    }
+
+    /**
+     * Provoke back click if user need it without backView etc. Make GetMe more flexible
+     * */
+    fun provokeBackClick(clearSelection: Boolean) {
+        val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
+        if(getMeFragment != null) {
+            (getMeFragment as GetMeFragment).backClicked(clearSelection)
         }
     }
 

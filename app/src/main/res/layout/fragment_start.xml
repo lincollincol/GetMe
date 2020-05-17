@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/defaultGetMe"
+            android:text="Default GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/customGetMeItemLayout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/customGetMeItemLayout"
+            android:text="Custom GetMe item layout"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/defaultGetMe"
+            app:layout_constraintBottom_toTopOf="@id/customGetMeStyle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/customGetMeStyle"
+            android:text="Custom GetMe style"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/customGetMeItemLayout"
+            app:layout_constraintBottom_toTopOf="@id/getMeMainContent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeMainContent"
+            android:text="Main content GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/customGetMeStyle"
+            app:layout_constraintBottom_toTopOf="@id/getMeExceptContent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeExceptContent"
+            android:text="Except content GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeMainContent"
+            app:layout_constraintBottom_toTopOf="@id/getMeOnlyDirectories"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeOnlyDirectories"
+            android:text="Only directories GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeExceptContent"
+            app:layout_constraintBottom_toTopOf="@id/getMeSingleSelection"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeSingleSelection"
+            android:text="Single selection GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeOnlyDirectories"
+            app:layout_constraintBottom_toTopOf="@id/getMeFromActivity"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeFromActivity"
+            android:text="GetMe from activity"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeSingleSelection"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -1,30 +1,20 @@
 package linc.com.getmeexample
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.selection.SelectionTracker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import kotlinx.android.synthetic.main.activity_main.*
 import linc.com.getme.GetMe
-import linc.com.getme.domain.entities.GetMeFilesystemSettings
-import linc.com.getme.ui.GetMeInterfaceSettings
-import linc.com.getme.ui.callbacks.CloseFileManagerCallback
-import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
-import linc.com.getme.ui.callbacks.SelectionTrackerCallback
-import linc.com.getme.ui.models.FilesystemEntityModel
-import java.io.File
+import linc.com.getmeexample.fragments.ExampleGetMeFragment
+import linc.com.getmeexample.fragments.FileManagerFragment
+import linc.com.getmeexample.fragments.StartFragment
 
-class MainActivity : AppCompatActivity(),
-    CloseFileManagerCallback,
-    FileManagerCompleteCallback,
-    SelectionTrackerCallback {
-
-    lateinit var getMe: GetMe
+class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,62 +32,39 @@ class MainActivity : AppCompatActivity(),
                 ) {}
             }).check()
 
-        getMe = GetMe(
-            supportFragmentManager,
-            R.id.fragmentContainer,
-            GetMeFilesystemSettings(
-                actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE
-//                mainContent = mutableListOf("pdf", "mp3")
-//                path = "/storage/emulated/0/viber/media",
-//                allowBackPath = true
-            ),
-            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
-            closeFileManagerCallback = this,
-            fileManagerCompleteCallback = this,
-            selectionTrackerCallback = this,
-            okView = getFiles,
-            backView = back,
-            firstClearSelectionAfterBack = true
-//            fileLayout = R.layout.item_get_me_custom
-//            style = R.style.GetMeCustomTheme
-        )
 
-        open.setOnClickListener {
-            getMe.show()
-        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, StartFragment())
+            .commit()
 
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        getMe.onRestoreInstanceState(savedInstanceState)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, supportFragmentManager.getFragment(savedInstanceState, "FRA")!!)
+            .commit()
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        getMe.onSaveInstanceState(outState)
+        supportFragmentManager.putFragment(
+            outState,
+            "FRA",
+            supportFragmentManager.findFragmentById(R.id.fragmentContainer)!!
+        )
         super.onSaveInstanceState(outState)
     }
 
     override fun onBackPressed() {
-        getMe.onBackPressed()
-    }
 
-    override fun onCloseFileManager() {
-        // Remove GetMe from fragment manager
-        getMe.close()
-        // todo handle back pressed
-    }
-    override fun onFilesSelected(selectedFiles: List<File>) {
-        println(selectedFiles)
-    }
+        supportFragmentManager.fragments.forEach {
+            println(it::class.simpleName)
+        }
 
-    override fun onSelectionTrackerCreated(selectionTracker: SelectionTracker<FilesystemEntityModel>) {
-        selectionTracker.addObserver(object : SelectionTracker.SelectionObserver<FilesystemEntityModel>() {
-            override fun onSelectionChanged() {
-                super.onSelectionChanged()
-                // todo selection
-            }
-        })
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if(fragment != null && fragment is FileManagerFragment)
+            fragment.onBackPressed()
     }
 
 }
