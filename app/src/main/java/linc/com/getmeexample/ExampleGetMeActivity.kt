@@ -12,6 +12,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_example_get_me.*
+import kotlinx.android.synthetic.main.activity_main.*
 import linc.com.getme.GetMe
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
 import linc.com.getme.ui.GetMeInterfaceSettings
@@ -70,11 +71,10 @@ class ExampleGetMeActivity : AppCompatActivity(),
 
     override fun onCloseFileManager() {
         // Remove GetMe from fragment manager
-        getMe.close()
-
-        // TODO implement back click logic here after calling getMe.close()
-
-        super.onBackPressed()
+        getMe.close {
+            // TODO implement back click logic here after calling getMe.close()
+            finish()
+        }
     }
     override fun onFilesSelected(selectedFiles: List<File>) {
         println(selectedFiles)
@@ -98,6 +98,6 @@ class ExampleGetMeActivity : AppCompatActivity(),
     }
 
     override fun onMenuItemClicked(item: MenuItem?) {
-//        getMe.provokeOkClick()
+        getMe.provokeOkClick()
     }
 }

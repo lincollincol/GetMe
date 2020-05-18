@@ -44,6 +44,7 @@ class ExampleGetMeFragment : Fragment(),
         const val EXCEPT_CONTENT_GETME = 4
         const val ONLY_DIRECTORIES_GETME = 5
         const val SINGLE_SELECTION_GETME = 6
+        const val FROM_PATH_GETME = 7
     }
 
     override fun onCreateView(
@@ -66,10 +67,13 @@ class ExampleGetMeFragment : Fragment(),
             EXCEPT_CONTENT_GETME -> getExceptContentGetMe()
             ONLY_DIRECTORIES_GETME -> getOnlyDirectoriesGetMe()
             SINGLE_SELECTION_GETME -> getSingleSelectionGetMe()
+            FROM_PATH_GETME -> getFromPathGetMe()
             else -> getDefaultGetMe()
         }
 
-        getMe.show()
+        if(savedInstanceState == null) {
+            getMe.show()
+        }
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -89,13 +93,10 @@ class ExampleGetMeFragment : Fragment(),
 
     override fun onCloseFileManager() {
         // Remove GetMe from fragment manager
-        getMe.close()
-
-        println("CLOSED")
-        // Implement back click logic here after calling getMe.close()
-
-        // Close current fragment
-        fragmentManager?.popBackStack()
+        getMe.close {
+            // TODO Implement back click logic here after calling getMe.close()
+            fragmentManager?.popBackStack()
+        }
     }
 
     override fun onFilesSelected(selectedFiles: List<File>) {
@@ -123,7 +124,6 @@ class ExampleGetMeFragment : Fragment(),
         getMe.provokeOkClick()
     }
 
-
     /**
      *
      * GetMe settings types
@@ -132,7 +132,7 @@ class ExampleGetMeFragment : Fragment(),
 
     private fun getDefaultGetMe(): GetMe {
         return GetMe(
-            fragmentManager,
+            childFragmentManager,
             R.id.getMeContainer,
             GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
             GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
@@ -233,6 +233,25 @@ class ExampleGetMeFragment : Fragment(),
             fragmentManager,
             R.id.getMeContainer,
             GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
+            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_SINGLE),
+            closeFileManagerCallback = this,
+            fileManagerCompleteCallback = this,
+            selectionTrackerCallback = this,
+            okView = buttonGet,
+            backView = buttonBack,
+            firstClearSelectionAfterBack = true
+        )
+    }
+
+    private fun getFromPathGetMe(): GetMe {
+        return GetMe(
+            fragmentManager,
+            R.id.getMeContainer,
+            GetMeFilesystemSettings(
+                actionType = GetMeFilesystemSettings.ACTION_SELECT_FILE,
+                path = "/storage/emulated/0/Download",
+                allowBackPath = true
+            ),
             GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_SINGLE),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,

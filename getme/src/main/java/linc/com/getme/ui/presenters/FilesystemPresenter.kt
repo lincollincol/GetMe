@@ -133,4 +133,6 @@ internal class FilesystemPresenter(
                 })
         )
     }
+
+    fun retrieveState() = interactor.retrieveState()
 }

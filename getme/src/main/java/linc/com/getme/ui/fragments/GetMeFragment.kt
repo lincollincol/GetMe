@@ -294,4 +294,9 @@ internal class GetMeFragment : Fragment(),
         presenter?.openPreviousFilesystemEntity()
     }
 
+    /**
+     * Return current file manager state
+     * */
+    internal fun getState() = presenter?.retrieveState()
+
 }

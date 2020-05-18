@@ -32,21 +32,14 @@ class MainActivity : AppCompatActivity() {
                 ) {}
             }).check()
 
-
         if(savedInstanceState == null) {
-            startActivity(Intent(this, ExampleGetMeActivity::class.java))
-        }
-
-
-        /*if(savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, StartFragment())
                 .commit()
-        }*/
+        }
 
     }
 
-    /*
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         supportFragmentManager.beginTransaction()
@@ -64,14 +57,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-
-        supportFragmentManager.fragments.forEach {
-            println(it::class.simpleName)
-        }
-
         val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
         if(fragment != null && fragment is FileManagerFragment)
             fragment.onBackPressed()
     }
-    */
 }

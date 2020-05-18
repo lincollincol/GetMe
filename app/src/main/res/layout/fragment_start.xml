@@ -69,6 +69,15 @@
             android:text="Single selection GetMe"
             style="@style/GetMeExampleButtonStyle"
             app:layout_constraintTop_toBottomOf="@id/getMeOnlyDirectories"
+            app:layout_constraintBottom_toTopOf="@id/getMeFromPath"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeFromPath"
+            android:text="From path GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeSingleSelection"
             app:layout_constraintBottom_toTopOf="@id/getMeFromActivity"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -77,7 +86,7 @@
             android:id="@+id/getMeFromActivity"
             android:text="GetMe from activity"
             style="@style/GetMeExampleButtonStyle"
-            app:layout_constraintTop_toBottomOf="@id/getMeSingleSelection"
+            app:layout_constraintTop_toBottomOf="@id/getMeFromPath"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

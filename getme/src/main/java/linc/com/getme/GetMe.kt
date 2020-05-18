@@ -7,6 +7,7 @@ import androidx.annotation.StyleRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
+import linc.com.getme.domain.utils.StateManager
 import linc.com.getme.ui.GetMeInterfaceSettings
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
@@ -20,6 +21,7 @@ import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_FILE_LAYOUT
 import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
 import linc.com.getme.utils.Constants.Companion.TAG_GET_ME
+import javax.security.auth.callback.Callback
 
 class GetMe (
     private var fragmentManager: FragmentManager?,
@@ -29,11 +31,11 @@ class GetMe (
     private var closeFileManagerCallback: CloseFileManagerCallback?,
     private var fileManagerCompleteCallback: FileManagerCompleteCallback?,
     private var selectionTrackerCallback: SelectionTrackerCallback? = null,
-    var okView: View? = null,
-    var backView: View? = null,
-    var firstClearSelectionAfterBack: Boolean = false,
-    @StyleRes var style: Int = GET_ME_DEFAULT_STYLE,
-    @LayoutRes var fileLayout: Int = GET_ME_DEFAULT_FILE_LAYOUT
+    private var okView: View? = null,
+    private var backView: View? = null,
+    private var firstClearSelectionAfterBack: Boolean = false,
+    @StyleRes private var style: Int = GET_ME_DEFAULT_STYLE,
+    @LayoutRes private var fileLayout: Int = GET_ME_DEFAULT_FILE_LAYOUT
 ) {
 
     /**
@@ -69,13 +71,13 @@ class GetMe (
     /**
      * Remove GetMe from back stack and clear references
      * */
-    fun close() {
+    fun close(callback: () -> Unit) {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             fragmentManager!!.popBackStack()
         }
 
-        fragmentManager = null
+        this.fragmentManager = null
         fragmentContainer = null
         getMeFilesystemSettings = null
         getMeInterfaceSettings = null
@@ -84,6 +86,8 @@ class GetMe (
         selectionTrackerCallback = null
         okView = null
         backView = null
+
+        callback()
     }
 
     /**
@@ -148,6 +152,27 @@ class GetMe (
         if(getMeFragment != null) {
             (getMeFragment as GetMeFragment).backClicked(clearSelection)
         }
+    }
+
+    /**
+     * @return true if current state equals root
+     * */
+    fun isRoot(): Boolean {
+        val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
+        if(getMeFragment != null) {
+            return (getMeFragment as GetMeFragment).getState() == StateManager.ROOT
+        }
+        return false
+    }
+
+    /**
+     * @return current file manager state (path)
+     * */
+    fun getCurrentState(): String? {
+        val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
+        return if(getMeFragment != null) {
+            (getMeFragment as GetMeFragment).getState()
+        } else null
     }
 
 }

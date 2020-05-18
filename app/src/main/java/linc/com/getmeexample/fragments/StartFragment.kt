@@ -30,6 +30,7 @@ class StartFragment : Fragment(), View.OnClickListener {
         view.findViewById<Button>(R.id.getMeExceptContent).setOnClickListener(this)
         view.findViewById<Button>(R.id.getMeOnlyDirectories).setOnClickListener(this)
         view.findViewById<Button>(R.id.getMeSingleSelection).setOnClickListener(this)
+        view.findViewById<Button>(R.id.getMeFromPath).setOnClickListener(this)
         view.findViewById<Button>(R.id.getMeFromActivity).setOnClickListener(this)
     }
 
@@ -42,21 +43,23 @@ class StartFragment : Fragment(), View.OnClickListener {
             R.id.getMeExceptContent -> openFragment(ExampleGetMeFragment.EXCEPT_CONTENT_GETME)
             R.id.getMeOnlyDirectories -> openFragment(ExampleGetMeFragment.ONLY_DIRECTORIES_GETME)
             R.id.getMeSingleSelection -> openFragment(ExampleGetMeFragment.SINGLE_SELECTION_GETME)
+            R.id.getMeFromPath -> openFragment(ExampleGetMeFragment.FROM_PATH_GETME)
             R.id.getMeFromActivity -> {
-                startActivity(Intent(activity!!.applicationContext, ExampleGetMeActivity::class.java))
+                startActivity(Intent(this.context, ExampleGetMeActivity::class.java))
             }
         }
     }
 
     private fun openFragment(type: Int) {
-        activity!!.supportFragmentManager.beginTransaction()
-            .replace(
+        fragmentManager?.beginTransaction()
+            ?.replace(
                 R.id.fragmentContainer,
                 ExampleGetMeFragment.newInstance(Bundle().apply {
                     putInt("TYPE", type)
                 })
             )
-            .addToBackStack(null)
-            .commit()
+            ?.addToBackStack(null)
+            ?.commit()
     }
+
 }

@@ -298,4 +298,6 @@ internal class FilesystemInteractor(
         return dropLast(length - lastIndexOf(File.separator))
     }
 
+    fun retrieveState() = stateManager.getLast()
+
 }
