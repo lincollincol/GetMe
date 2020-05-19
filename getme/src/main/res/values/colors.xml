@@ -10,4 +10,10 @@
 
     <color name="color_text_get_me">#1D1E4F</color>
 
+    <color name="color_background_selection_check_icon_get_me">#3A3CD4</color>
+    <color name="color_background_selection_icon_get_me">#D6D6F6</color>
+
+    <color name="color_background_empty_directory_icon_get_me">#3A3CD4</color>
+    <color name="color_text_empty_directory_get_me">#3A3CD4</color>
+
 </resources>

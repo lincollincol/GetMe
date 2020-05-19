@@ -28,6 +28,12 @@
         <item name="color_background_circle_get_me">#E5989B</item>
         <item name="color_background_icon_get_me">#FFCCB2</item>
         <item name="color_text_get_me">#6D6875</item>
+        <item name="color_background_selection_check_icon_get_me">#E5989B</item>
+        <item name="color_background_selection_icon_get_me">#FFCCB2</item>
+        <item name="color_background_empty_directory_icon_get_me">#E5989B</item>
+        <item name="color_text_empty_directory_get_me">#E5989B</item>
+        <item name="size_text_empty_directory">20sp</item>
+        <item name="string_empty_directory_get_me">This directory is empty yet</item>
     </style>
 
 </resources>

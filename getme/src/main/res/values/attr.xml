@@ -10,6 +10,15 @@
     <attr name="color_background_circle_get_me" format="color"/>
     <attr name="color_background_icon_get_me" format="color"/>
 
+    <!--Items text-->
     <attr name="color_text_get_me" format="color"/>
+
+    <!--Selection icon-->
+    <attr name="color_background_selection_check_icon_get_me" format="color"/>
+    <attr name="color_background_selection_icon_get_me" format="color"/>
+    <attr name="color_background_empty_directory_icon_get_me" format="color"/>
+    <attr name="color_text_empty_directory_get_me" format="color"/>
+    <attr name="string_empty_directory_get_me" format="string"/>
+    <attr name="size_text_empty_directory" format="dimension"/>
 
 </resources>

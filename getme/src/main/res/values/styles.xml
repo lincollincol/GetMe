@@ -7,7 +7,13 @@
         <item name="color_background_ripple_get_me">@color/color_background_ripple_get_me</item>
         <item name="color_background_circle_get_me">@color/color_background_circle_get_me</item>
         <item name="color_background_icon_get_me">@color/color_background_icon_get_me</item>
+        <item name="color_background_selection_check_icon_get_me">@color/color_background_selection_check_icon_get_me</item>
+        <item name="color_background_selection_icon_get_me">@color/color_background_selection_icon_get_me</item>
+        <item name="color_background_empty_directory_icon_get_me">@color/color_background_empty_directory_icon_get_me</item>
+        <item name="color_text_empty_directory_get_me">@color/color_text_empty_directory_get_me</item>
         <item name="color_text_get_me">@color/color_text_get_me</item>
+        <item name="size_text_empty_directory">@dimen/size_text_empty_directory</item>
+        <item name="string_empty_directory_get_me">@string/string_empty_directory_get_me</item>
     </style>
 
 </resources>

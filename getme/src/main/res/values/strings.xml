@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GetMe</string>
+    <string name="string_empty_directory_get_me">Empty directory</string>
 </resources>

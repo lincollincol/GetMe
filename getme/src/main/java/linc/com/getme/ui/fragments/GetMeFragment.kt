@@ -6,6 +6,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.selection.SelectionPredicates
@@ -56,6 +57,7 @@ internal class GetMeFragment : Fragment(),
 
     // Ui
     private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
+    private lateinit var containerEmptyDirectoryGetMe: LinearLayout
     private var filesystemEntityKeyProvider: FilesystemEntityKeyProvider? = null
     private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
     private var filesystemEntities: RecyclerView? = null
@@ -155,6 +157,8 @@ internal class GetMeFragment : Fragment(),
             )
         }
 
+        containerEmptyDirectoryGetMe = view.findViewById(R.id.containerEmptyDirectoryGetMe)
+
         filesystemEntities = view.findViewById<RecyclerView>(R.id.filesystemEntitiesGetMe).apply {
             layoutManager = LinearLayoutManager(activity)
             adapter = filesystemEntitiesAdapter
@@ -165,6 +169,9 @@ internal class GetMeFragment : Fragment(),
 
     }
 
+    /**
+     * Update adapter items with directories or files entities
+     * */
     override fun showFilesystemEntities(filesystemEntityModels: List<FilesystemEntityModel>) {
         filesystemEntitiesAdapter.updateFilesystemEntities(filesystemEntityModels)
         filesystemEntityKeyProvider?.setFilesystemEntities(filesystemEntityModels)
@@ -177,12 +184,25 @@ internal class GetMeFragment : Fragment(),
         }
     }
 
+    /**
+     * Show icon and title about empty directory
+     * */
+    override fun showEmptySign(visibility: Int) {
+        containerEmptyDirectoryGetMe.visibility = visibility
+    }
+
+    /**
+     * Close callback. Call method in the external app to implement back pressed logic
+     * */
     override fun closeManager(resultFiles: List<File>) {
         if(!resultFiles.isNullOrEmpty())
             fileManagerCompleteCallback.onFilesSelected(resultFiles)
         closeFileManagerCallback.onCloseFileManager()
     }
 
+    /**
+     * Initialize SelectionTracker is external app need it
+     * */
     override fun enableSelection(enable: Boolean) {
         if (!enable) return
 
@@ -204,10 +224,16 @@ internal class GetMeFragment : Fragment(),
         filesystemEntitiesAdapter.setSelectionTracker(selectionTracker!!)
     }
 
+    /**
+     * Move adapter position to top
+     * */
     override fun scrollToTop() {
         filesystemEntities?.scrollToPosition(RECYCLER_VIEW_TOP)
     }
 
+    /**
+     * Handle item (directory/file) click
+     * */
     override fun onClick(filesystemEntityModel: FilesystemEntityModel) {
         presenter?.handleFilesystemEntityAction(filesystemEntityModel)
     }

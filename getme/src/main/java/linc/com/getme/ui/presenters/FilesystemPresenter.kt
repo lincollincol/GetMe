@@ -1,6 +1,7 @@
 package linc.com.getme.ui.presenters
 
 import android.content.Context
+import android.view.View
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -42,6 +43,7 @@ internal class FilesystemPresenter(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    showEmptyDirectorySign(it.isEmpty())
                     view?.showFilesystemEntities(it)
                 }, {
                     it.printStackTrace()
@@ -56,6 +58,7 @@ internal class FilesystemPresenter(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    showEmptyDirectorySign(it.isEmpty())
                     view?.showFilesystemEntities(it)
                     view?.scrollToTop()
                 }, {
@@ -74,6 +77,7 @@ internal class FilesystemPresenter(
                     if(it.isEmpty()) {
                         view?.closeManager(emptyList())
                     }else {
+                        showEmptyDirectorySign(it.isEmpty())
                         view?.showFilesystemEntities(it)
                         view?.scrollToTop()
                     }
@@ -127,6 +131,7 @@ internal class FilesystemPresenter(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    showEmptyDirectorySign(it.isEmpty())
                     view?.showFilesystemEntities(it)
                 }, {
                     it.printStackTrace()
@@ -135,4 +140,11 @@ internal class FilesystemPresenter(
     }
 
     fun retrieveState() = interactor.retrieveState()
+
+    private fun showEmptyDirectorySign(isDirectoryEmpty: Boolean) {
+        view?.showEmptySign(when(isDirectoryEmpty) {
+            true -> View.VISIBLE
+            else -> View.GONE
+        })
+    }
 }

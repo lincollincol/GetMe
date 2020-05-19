@@ -91,7 +91,7 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
             itemView.findViewById<ImageView>(R.id.fileTypeIconGetMe)?.apply {
                 setImageResource(
                     if(filesystemEntityModel.isDirectory)
-                        R.drawable.ic_folder_get_me
+                        R.drawable.ic_directory_get_me
                     else
                         R.drawable.ic_file_get_me
                 )
@@ -154,7 +154,7 @@ inner class FilesystemEntityViewHolder(
             itemView.findViewById<ImageView>(R.id.fileTypeIconGetMe).apply {
                 setImageResource(
                     if(filesystemEntityModel.isDirectory)
-                        R.drawable.ic_folder_get_me
+                        R.drawable.ic_directory_get_me
                     else
                         R.drawable.ic_file_get_me
                 )

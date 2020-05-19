@@ -16,7 +16,7 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginBottom="@dimen/margin_medium"
         android:layout_marginStart="@dimen/margin_medium"
-        android:src="@drawable/ic_folder_get_me"
+        android:src="@drawable/ic_directory_get_me"
         android:background="@drawable/background_filesystem_entity_icon_get_me"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
