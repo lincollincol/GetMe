@@ -44,8 +44,6 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = FilesystemEntityViewHolder(
-//        LayoutInflater.from(parent.context)
-//            .inflate(R.layout.item_filesystem_entity_get_me, parent, false)
         LayoutInflater.from(parent.context)
             .inflate(itemLayout, parent, false)
     )
@@ -101,8 +99,13 @@ internal class FilesystemEntitiesAdapter : RecyclerView.Adapter<FilesystemEntiti
         }
 
         override fun onClick(v: View?) {
-            if(!selectionMode)
-                filesystemEntityClickListener.onClick(filesystemEntityModels[adapterPosition])
+
+            if(!selectionMode) {
+                when(itemView.id) {
+                    v?.id -> filesystemEntityClickListener.onClick(filesystemEntityModels[adapterPosition])
+                }
+            }
+
         }
 
         override fun getItemDetails(): ItemDetailsLookup.ItemDetails<FilesystemEntityModel> {

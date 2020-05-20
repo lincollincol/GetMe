@@ -15,6 +15,8 @@ import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import jp.wasabeef.recyclerview.adapters.*
+import jp.wasabeef.recyclerview.animators.BaseItemAnimator
 import linc.com.getme.R
 import linc.com.getme.data.preferences.LocalPreferences
 import linc.com.getme.device.StorageHelper
@@ -40,6 +42,7 @@ import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
 import linc.com.getme.utils.Constants.Companion.KEY_RECYCLER_VIEW_STATE
 import linc.com.getme.utils.Constants.Companion.KEY_SELECTION_STATE
 import linc.com.getme.utils.Constants.Companion.RECYCLER_VIEW_TOP
+import linc.com.getme.utils.RecyclerViewAnimationProvider
 import java.io.File
 
 
@@ -58,6 +61,7 @@ internal class GetMeFragment : Fragment(),
     // Ui
     private lateinit var filesystemEntitiesAdapter: FilesystemEntitiesAdapter
     private lateinit var containerEmptyDirectoryGetMe: LinearLayout
+    private var animationAdapter: AnimationAdapter? = null
     private var filesystemEntityKeyProvider: FilesystemEntityKeyProvider? = null
     private var selectionTracker: SelectionTracker<FilesystemEntityModel>? = null
     private var filesystemEntities: RecyclerView? = null
@@ -92,7 +96,7 @@ internal class GetMeFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        presenter?.bind(this)
+        presenter?.prepare()
     }
 
     override fun onStop() {
@@ -144,24 +148,13 @@ internal class GetMeFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {
-            setFilesystemEntityClickListener(this@GetMeFragment)
-            val layout = arguments!!.getInt(Constants.KEY_GET_ME_FILE_LAYOUT)
-            // Set adapter item layout
-            setLayout(
-                when(layout) {
-                    GET_ME_DEFAULT_FILE_LAYOUT -> R.layout.item_filesystem_entity_get_me
-                    else -> layout
-                }
-            )
-        }
-
         containerEmptyDirectoryGetMe = view.findViewById(R.id.containerEmptyDirectoryGetMe)
+
+        presenter?.bind(this)
 
         filesystemEntities = view.findViewById<RecyclerView>(R.id.filesystemEntitiesGetMe).apply {
             layoutManager = LinearLayoutManager(activity)
-            adapter = filesystemEntitiesAdapter
+            adapter = animationAdapter ?: filesystemEntitiesAdapter
             setHasFixedSize(true)
         }
 
@@ -232,10 +225,34 @@ internal class GetMeFragment : Fragment(),
     }
 
     /**
+     * Initialize adapter and apply animation if it is selected from external app
+     * */
+    override fun initFilesystemEntitiesAdapter(adapterAnimation: Int, firstOnly: Boolean) {
+        filesystemEntitiesAdapter = FilesystemEntitiesAdapter().apply {
+            setFilesystemEntityClickListener(this@GetMeFragment)
+            val layout = arguments!!.getInt(Constants.KEY_GET_ME_FILE_LAYOUT)
+            // Set adapter item layout
+            setLayout(
+                when(layout) {
+                    GET_ME_DEFAULT_FILE_LAYOUT -> R.layout.item_filesystem_entity_get_me
+                    else -> layout
+                }
+            )
+        }
+
+        animationAdapter = RecyclerViewAnimationProvider.adapterAnimationFromConst(
+            adapterAnimation,
+            firstOnly,
+            filesystemEntitiesAdapter
+        )
+    }
+
+    /**
      * Handle item (directory/file) click
      * */
     override fun onClick(filesystemEntityModel: FilesystemEntityModel) {
         presenter?.handleFilesystemEntityAction(filesystemEntityModel)
+        selectionTracker?.clearSelection()
     }
 
     /**

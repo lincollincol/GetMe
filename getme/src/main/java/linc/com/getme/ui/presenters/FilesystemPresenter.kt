@@ -1,18 +1,15 @@
 package linc.com.getme.ui.presenters
 
-import android.content.Context
 import android.view.View
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import linc.com.getme.domain.entities.FilesystemEntity
 import linc.com.getme.domain.FilesystemInteractor
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
 import linc.com.getme.ui.GetMeInterfaceSettings
 import linc.com.getme.ui.mappers.FilesystemEntityMapper
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.views.FilesystemView
-
 
 internal class FilesystemPresenter(
     private val interactor: FilesystemInteractor,
@@ -22,18 +19,34 @@ internal class FilesystemPresenter(
 
     private var view: FilesystemView? = null
 
+    /**
+     * Bind created view and set first settings
+     * */
     fun bind(view: FilesystemView) {
         this.view = view
+        view.initFilesystemEntitiesAdapter(
+            getMeInterfaceSettings.adapterAnimation,
+            getMeInterfaceSettings.animationFirstOnly
+        )
+    }
+
+    /**
+     * Clear resources when view is stopped
+     * */
+    fun unbind() {
+        this.view = null
+        this.compositeDisposable.clear()
+    }
+
+    /**
+     * Some widgets created and here pass other settings
+     * */
+    fun prepare() {
         val selectionState = when(getMeInterfaceSettings.selectionType) {
             GetMeInterfaceSettings.SELECTION_SINGLE -> false
             else -> true
         }
-        view.enableSelection(selectionState)
-    }
-
-    fun unbind() {
-        this.view = null
-        this.compositeDisposable.clear()
+        view?.enableSelection(selectionState)
     }
 
     fun getFilesystemEntities() {

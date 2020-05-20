@@ -135,7 +135,12 @@ class ExampleGetMeFragment : Fragment(),
             childFragmentManager,
             R.id.getMeContainer,
             GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
-            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
+            GetMeInterfaceSettings(
+                selectionType = GetMeInterfaceSettings.SELECTION_MIXED,
+                itemAnimation = GetMeInterfaceSettings.ANIMATION_ITEM_FADE_IN
+//                adapterAnimation = GetMeInterfaceSettings.ANIMATION_ADAPTER_SCALE_IN,
+//                animationFirstOnly = false
+            ),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,
             selectionTrackerCallback = this,
