@@ -46,7 +46,10 @@ internal class FilesystemPresenter(
             GetMeInterfaceSettings.SELECTION_SINGLE -> false
             else -> true
         }
-        view?.enableSelection(selectionState)
+        view?.enableSelection(
+            selectionState,
+            getMeInterfaceSettings.selectionMaxSize
+        )
     }
 
     fun getFilesystemEntities() {

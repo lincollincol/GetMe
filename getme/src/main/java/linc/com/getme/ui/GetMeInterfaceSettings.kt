@@ -6,9 +6,10 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class GetMeInterfaceSettings(
     internal val selectionType: Int = SELECTION_SINGLE,
-    internal var actionType: Int = 0,
-    internal var adapterAnimation: Int = 0,
-    internal var animationFirstOnly: Boolean = true
+    internal val selectionMaxSize: Int = SELECTION_SIZE_DEFAULT,
+    internal var adapterAnimation: Int = ANIMATION_ADAPTER_DISABLE,
+    internal var animationFirstOnly: Boolean = true,
+    internal var actionType: Int = 0
 ) : Parcelable {
 
     companion object {
@@ -16,6 +17,7 @@ class GetMeInterfaceSettings(
         const val SELECTION_SINGLE = 101
         const val SELECTION_MULTIPLE = 111
         const val SELECTION_MIXED = 121
+        const val SELECTION_SIZE_DEFAULT = -1
 
         // Adapter animations
         const val ANIMATION_ADAPTER_DISABLE = 202

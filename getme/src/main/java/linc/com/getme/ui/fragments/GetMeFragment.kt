@@ -22,6 +22,7 @@ import linc.com.getme.data.preferences.LocalPreferences
 import linc.com.getme.device.StorageHelper
 import linc.com.getme.domain.FilesystemInteractor
 import linc.com.getme.domain.utils.StateManager
+import linc.com.getme.ui.GetMeInterfaceSettings
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
 import linc.com.getme.ui.adapters.selection.FilesystemEntityKeyProvider
 import linc.com.getme.ui.adapters.selection.FilesystemEntityLookup
@@ -196,7 +197,7 @@ internal class GetMeFragment : Fragment(),
     /**
      * Initialize SelectionTracker is external app need it
      * */
-    override fun enableSelection(enable: Boolean) {
+    override fun enableSelection(enable: Boolean, maxSize: Int) {
         if (!enable) return
 
         if(selectionTracker != null) {
@@ -210,7 +211,32 @@ internal class GetMeFragment : Fragment(),
                 filesystemEntityKeyProvider!!,
                 FilesystemEntityLookup(filesystemEntities!!),
                 StorageStrategy.createParcelableStorage(FilesystemEntityModel::class.java)
-            ).withSelectionPredicate(SelectionPredicates.createSelectAnything())
+            )
+            .apply {
+                if(maxSize == GetMeInterfaceSettings.SELECTION_SIZE_DEFAULT) {
+                    withSelectionPredicate(SelectionPredicates.createSelectAnything())
+                } else {
+                    withSelectionPredicate(object : SelectionTracker.SelectionPredicate<FilesystemEntityModel>() {
+                        override fun canSelectMultiple() = true
+
+                        override fun canSetStateForKey(
+                            key: FilesystemEntityModel,
+                            nextState: Boolean
+                        ): Boolean {
+                            if(nextState && selectionTracker!!.selection.size() >= 10) {
+                                return false
+                            }
+                            return true
+                        }
+
+                        override fun canSetStateAtPosition(
+                            position: Int,
+                            nextState: Boolean
+                        ) = true
+
+                    })
+                }
+            }
             .build()
 
         selectionTrackerCallback.onSelectionTrackerCreated(selectionTracker!!)

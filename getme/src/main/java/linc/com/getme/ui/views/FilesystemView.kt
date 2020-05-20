@@ -9,7 +9,7 @@ internal interface FilesystemView {
     fun showEmptySign(visibility: Int)
     fun closeManager(resultFiles: List<File>)
     fun scrollToTop()
-    fun enableSelection(enable: Boolean)
+    fun enableSelection(enable: Boolean, maxSize: Int)
     fun initFilesystemEntitiesAdapter(adapterAnimation: Int, firstOnly: Boolean)
 
 }

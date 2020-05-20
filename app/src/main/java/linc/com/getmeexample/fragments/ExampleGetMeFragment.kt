@@ -137,9 +137,9 @@ class ExampleGetMeFragment : Fragment(),
             GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
             GetMeInterfaceSettings(
                 selectionType = GetMeInterfaceSettings.SELECTION_MIXED,
-                itemAnimation = GetMeInterfaceSettings.ANIMATION_ITEM_FADE_IN
-//                adapterAnimation = GetMeInterfaceSettings.ANIMATION_ADAPTER_SCALE_IN,
-//                animationFirstOnly = false
+                selectionMaxSize = 10,
+                adapterAnimation = GetMeInterfaceSettings.ANIMATION_ADAPTER_FADE_IN,
+                animationFirstOnly = false
             ),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,
