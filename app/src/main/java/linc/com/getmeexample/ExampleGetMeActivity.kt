@@ -1,18 +1,11 @@
 package linc.com.getmeexample
 
-import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import androidx.recyclerview.selection.SelectionTracker
-import com.karumi.dexter.Dexter
-import com.karumi.dexter.MultiplePermissionsReport
-import com.karumi.dexter.PermissionToken
-import com.karumi.dexter.listener.PermissionRequest
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import kotlinx.android.synthetic.main.activity_example_get_me.*
-import kotlinx.android.synthetic.main.activity_main.*
 import linc.com.getme.GetMe
 import linc.com.getme.domain.entities.GetMeFilesystemSettings
 import linc.com.getme.ui.GetMeInterfaceSettings
@@ -98,6 +91,6 @@ class ExampleGetMeActivity : AppCompatActivity(),
     }
 
     override fun onMenuItemClicked(item: MenuItem?) {
-        getMe.provokeOkClick()
+        getMe.performOkClick()
     }
 }

@@ -21,6 +21,8 @@ import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_FILE_LAYOUT
 import linc.com.getme.utils.Constants.Companion.KEY_GET_ME_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_INTERFACE_SETTINGS
 import linc.com.getme.utils.Constants.Companion.TAG_GET_ME
+import java.lang.StringBuilder
+import java.util.*
 import javax.security.auth.callback.Callback
 
 class GetMe (
@@ -137,7 +139,7 @@ class GetMe (
     /**
      * Provoke ok click if user need it without okView etc. Make GetMe more flexible
      * */
-    fun provokeOkClick() {
+    fun performOkClick() {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             (getMeFragment as GetMeFragment).okClicked()
@@ -147,7 +149,7 @@ class GetMe (
     /**
      * Provoke back click if user need it without backView etc. Make GetMe more flexible
      * */
-    fun provokeBackClick(clearSelection: Boolean) {
+    fun performBackClick(clearSelection: Boolean) {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             (getMeFragment as GetMeFragment).backClicked(clearSelection)
@@ -160,7 +162,8 @@ class GetMe (
     fun isRoot(): Boolean {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
-            return (getMeFragment as GetMeFragment).getState() == StateManager.ROOT
+            return (getMeFragment as GetMeFragment)
+                .getState() == StateManager.ROOT
         }
         return false
     }
@@ -168,7 +171,7 @@ class GetMe (
     /**
      * @return current file manager state (path)
      * */
-    fun getCurrentState(): String? {
+    fun getCurrentPath(): String? {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         return if(getMeFragment != null) {
             (getMeFragment as GetMeFragment).getState()

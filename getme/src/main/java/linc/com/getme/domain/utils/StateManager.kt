@@ -26,8 +26,8 @@ internal class StateManager {
 
     fun reverse() = currentPathState.reverse()
 
-
     companion object {
         const val ROOT = "root"
     }
+
 }

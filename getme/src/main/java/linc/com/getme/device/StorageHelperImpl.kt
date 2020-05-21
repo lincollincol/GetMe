@@ -3,15 +3,16 @@ package linc.com.getme.device
 
 import android.content.Context
 import android.os.storage.StorageManager
+import linc.com.getme.domain.device.StorageHelper
 import java.lang.reflect.Array
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
-internal class StorageHelper(
+internal class StorageHelperImpl(
     private val context: Context
-) {
+) : StorageHelper {
 
-    fun getExternalStoragePath(isRemovableStorage: Boolean): String? {
+    override fun getExternalStoragePath(isRemovableStorage: Boolean): String? {
         val mStorageManager =
             context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
         val storageVolumeClazz: Class<*>

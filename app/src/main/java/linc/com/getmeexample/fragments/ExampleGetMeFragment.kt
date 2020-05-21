@@ -82,6 +82,7 @@ class ExampleGetMeFragment : Fragment(),
         if(savedInstanceState == null) {
             getMe.show()
         }
+
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -129,7 +130,7 @@ class ExampleGetMeFragment : Fragment(),
     }
 
     override fun onMenuItemClicked(item: MenuItem?) {
-        getMe.provokeOkClick()
+        getMe.performOkClick()
     }
 
     /**

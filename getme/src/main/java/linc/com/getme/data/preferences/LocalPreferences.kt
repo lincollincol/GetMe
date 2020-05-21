@@ -3,15 +3,14 @@ package linc.com.getme.data.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import linc.com.getme.domain.LocalFastStorage
+import linc.com.getme.domain.data.LocalFastStorage
 import linc.com.getme.utils.Constants.Companion.KEY_STACK_STATE
 import org.json.JSONArray
-import org.json.JSONObject
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-internal class LocalPreferences(private val context: Context) : LocalFastStorage {
+internal class LocalPreferences(private val context: Context) :
+    LocalFastStorage {
 
     override fun clearLocalStorage() {
         getEditor().remove(KEY_STACK_STATE)

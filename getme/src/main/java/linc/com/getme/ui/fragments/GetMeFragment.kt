@@ -19,8 +19,8 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import jp.wasabeef.recyclerview.adapters.AnimationAdapter
 import linc.com.getme.R
 import linc.com.getme.data.preferences.LocalPreferences
-import linc.com.getme.device.StorageHelper
-import linc.com.getme.domain.FilesystemInteractor
+import linc.com.getme.device.StorageHelperImpl
+import linc.com.getme.domain.FilesystemInteractorImpl
 import linc.com.getme.domain.utils.StateManager
 import linc.com.getme.ui.GetMeInterfaceSettings
 import linc.com.getme.ui.adapters.FilesystemEntitiesAdapter
@@ -33,6 +33,7 @@ import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.custom.OverScrollBehavior
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.presenters.FilesystemPresenter
+import linc.com.getme.ui.presenters.FilesystemPresenterImpl
 import linc.com.getme.ui.views.FilesystemView
 import linc.com.getme.utils.Constants
 import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_FILE_LAYOUT
@@ -82,9 +83,9 @@ internal class GetMeFragment : Fragment(),
         super.onCreate(savedInstanceState)
 
         if(presenter == null) {
-            presenter = FilesystemPresenter(
-                FilesystemInteractor(
-                    StorageHelper(activity!!.applicationContext),
+            presenter = FilesystemPresenterImpl(
+                FilesystemInteractorImpl(
+                    StorageHelperImpl(activity!!.applicationContext),
                     StateManager(),
                     arguments?.getParcelable(KEY_FILESYSTEM_SETTINGS)!!,
                     LocalPreferences(activity!!.applicationContext)
