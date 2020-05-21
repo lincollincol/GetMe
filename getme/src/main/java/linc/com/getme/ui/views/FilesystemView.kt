@@ -11,5 +11,6 @@ internal interface FilesystemView {
     fun scrollToTop()
     fun enableSelection(enable: Boolean, maxSize: Int)
     fun initFilesystemEntitiesAdapter(adapterAnimation: Int, firstOnly: Boolean)
+    fun enableOverScroll(enable: Boolean)
 
 }

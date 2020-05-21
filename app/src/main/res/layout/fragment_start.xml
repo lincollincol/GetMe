@@ -78,6 +78,33 @@
             android:text="From path GetMe"
             style="@style/GetMeExampleButtonStyle"
             app:layout_constraintTop_toBottomOf="@id/getMeSingleSelection"
+            app:layout_constraintBottom_toTopOf="@id/getMeMaximumSelectionSize"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeMaximumSelectionSize"
+            android:text="Maximum selection size GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeFromPath"
+            app:layout_constraintBottom_toTopOf="@id/getMeAdapterAnimation"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeAdapterAnimation"
+            android:text="Adapter animation GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeMaximumSelectionSize"
+            app:layout_constraintBottom_toTopOf="@id/getMeOverScroll"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/getMeOverScroll"
+            android:text="OverScroll GetMe"
+            style="@style/GetMeExampleButtonStyle"
+            app:layout_constraintTop_toBottomOf="@id/getMeAdapterAnimation"
             app:layout_constraintBottom_toTopOf="@id/getMeFromActivity"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -86,7 +113,7 @@
             android:id="@+id/getMeFromActivity"
             android:text="GetMe from activity"
             style="@style/GetMeExampleButtonStyle"
-            app:layout_constraintTop_toBottomOf="@id/getMeFromPath"
+            app:layout_constraintTop_toBottomOf="@id/getMeOverScroll"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
@@ -15,8 +16,7 @@ import androidx.recyclerview.selection.StorageStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import jp.wasabeef.recyclerview.adapters.*
-import jp.wasabeef.recyclerview.animators.BaseItemAnimator
+import jp.wasabeef.recyclerview.adapters.AnimationAdapter
 import linc.com.getme.R
 import linc.com.getme.data.preferences.LocalPreferences
 import linc.com.getme.device.StorageHelper
@@ -30,6 +30,7 @@ import linc.com.getme.ui.adapters.selection.SelectionState
 import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
+import linc.com.getme.ui.custom.OverScrollBehavior
 import linc.com.getme.ui.models.FilesystemEntityModel
 import linc.com.getme.ui.presenters.FilesystemPresenter
 import linc.com.getme.ui.views.FilesystemView
@@ -271,6 +272,17 @@ internal class GetMeFragment : Fragment(),
             firstOnly,
             filesystemEntitiesAdapter
         )
+    }
+
+    /**
+     * Set layout over scroll behavior if external app use enableOverScroll = true
+     * */
+    override fun enableOverScroll(enable: Boolean) {
+        if (!enable) return
+        val overScrollParams =
+            filesystemEntities?.layoutParams as CoordinatorLayout.LayoutParams
+        overScrollParams.behavior = OverScrollBehavior()
+        filesystemEntities?.requestLayout()
     }
 
     /**

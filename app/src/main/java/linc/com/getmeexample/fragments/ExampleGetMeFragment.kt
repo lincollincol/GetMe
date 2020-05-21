@@ -33,8 +33,10 @@ class ExampleGetMeFragment : Fragment(),
     private var actionMode: ActionMode? = null
 
     companion object {
-        fun newInstance(data: Bundle) = ExampleGetMeFragment().apply {
-            arguments = data
+        fun newInstance(type: Int) = ExampleGetMeFragment().apply {
+            arguments = Bundle().apply {
+                putInt("TYPE", type)
+            }
         }
 
         const val DEFAULT_GETME = 0
@@ -45,6 +47,9 @@ class ExampleGetMeFragment : Fragment(),
         const val ONLY_DIRECTORIES_GETME = 5
         const val SINGLE_SELECTION_GETME = 6
         const val FROM_PATH_GETME = 7
+        const val MAX_SELECTION_SIZE_GETME = 8
+        const val ADAPTER_ANIMATION_GETME = 9
+        const val OVERSCROLL_GETME = 10
     }
 
     override fun onCreateView(
@@ -68,6 +73,9 @@ class ExampleGetMeFragment : Fragment(),
             ONLY_DIRECTORIES_GETME -> getOnlyDirectoriesGetMe()
             SINGLE_SELECTION_GETME -> getSingleSelectionGetMe()
             FROM_PATH_GETME -> getFromPathGetMe()
+            MAX_SELECTION_SIZE_GETME -> getMaximumSelectionSizeGetMe()
+            ADAPTER_ANIMATION_GETME -> getAdapterAnimationGetMe()
+            OVERSCROLL_GETME -> getOverScrollGetMe()
             else -> getDefaultGetMe()
         }
 
@@ -135,12 +143,7 @@ class ExampleGetMeFragment : Fragment(),
             childFragmentManager,
             R.id.getMeContainer,
             GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
-            GetMeInterfaceSettings(
-                selectionType = GetMeInterfaceSettings.SELECTION_MIXED,
-                selectionMaxSize = 10,
-                adapterAnimation = GetMeInterfaceSettings.ANIMATION_ADAPTER_FADE_IN,
-                animationFirstOnly = false
-            ),
+            GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_MIXED),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,
             selectionTrackerCallback = this,
@@ -258,6 +261,61 @@ class ExampleGetMeFragment : Fragment(),
                 allowBackPath = true
             ),
             GetMeInterfaceSettings(GetMeInterfaceSettings.SELECTION_SINGLE),
+            closeFileManagerCallback = this,
+            fileManagerCompleteCallback = this,
+            selectionTrackerCallback = this,
+            okView = buttonGet,
+            backView = buttonBack,
+            firstClearSelectionAfterBack = true
+        )
+    }
+
+    private fun getMaximumSelectionSizeGetMe(): GetMe {
+        return GetMe(
+            childFragmentManager,
+            R.id.getMeContainer,
+            GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
+            GetMeInterfaceSettings(
+                selectionType = GetMeInterfaceSettings.SELECTION_MIXED,
+                selectionMaxSize = 10
+            ),
+            closeFileManagerCallback = this,
+            fileManagerCompleteCallback = this,
+            selectionTrackerCallback = this,
+            okView = buttonGet,
+            backView = buttonBack,
+            firstClearSelectionAfterBack = true
+        )
+    }
+
+    private fun getAdapterAnimationGetMe(): GetMe {
+        return GetMe(
+            childFragmentManager,
+            R.id.getMeContainer,
+            GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
+            GetMeInterfaceSettings(
+                selectionType = GetMeInterfaceSettings.SELECTION_MIXED,
+                adapterAnimation = GetMeInterfaceSettings.ANIMATION_ADAPTER_FADE_IN,
+                animationFirstOnly = false
+            ),
+            closeFileManagerCallback = this,
+            fileManagerCompleteCallback = this,
+            selectionTrackerCallback = this,
+            okView = buttonGet,
+            backView = buttonBack,
+            firstClearSelectionAfterBack = true
+        )
+    }
+
+    private fun getOverScrollGetMe(): GetMe {
+        return GetMe(
+            childFragmentManager,
+            R.id.getMeContainer,
+            GetMeFilesystemSettings(GetMeFilesystemSettings.ACTION_SELECT_FILE),
+            GetMeInterfaceSettings(
+                selectionType = GetMeInterfaceSettings.SELECTION_MIXED,
+                enableOverScroll = true
+            ),
             closeFileManagerCallback = this,
             fileManagerCompleteCallback = this,
             selectionTrackerCallback = this,

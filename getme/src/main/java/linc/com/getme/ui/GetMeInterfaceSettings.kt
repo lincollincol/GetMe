@@ -7,6 +7,7 @@ import kotlinx.android.parcel.Parcelize
 class GetMeInterfaceSettings(
     internal val selectionType: Int = SELECTION_SINGLE,
     internal val selectionMaxSize: Int = SELECTION_SIZE_DEFAULT,
+    internal val enableOverScroll: Boolean = false,
     internal var adapterAnimation: Int = ANIMATION_ADAPTER_DISABLE,
     internal var animationFirstOnly: Boolean = true,
     internal var actionType: Int = 0

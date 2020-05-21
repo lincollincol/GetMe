@@ -31,6 +31,9 @@ class StartFragment : Fragment(), View.OnClickListener {
         view.findViewById<Button>(R.id.getMeOnlyDirectories).setOnClickListener(this)
         view.findViewById<Button>(R.id.getMeSingleSelection).setOnClickListener(this)
         view.findViewById<Button>(R.id.getMeFromPath).setOnClickListener(this)
+        view.findViewById<Button>(R.id.getMeMaximumSelectionSize).setOnClickListener(this)
+        view.findViewById<Button>(R.id.getMeAdapterAnimation).setOnClickListener(this)
+        view.findViewById<Button>(R.id.getMeOverScroll).setOnClickListener(this)
         view.findViewById<Button>(R.id.getMeFromActivity).setOnClickListener(this)
     }
 
@@ -44,6 +47,9 @@ class StartFragment : Fragment(), View.OnClickListener {
             R.id.getMeOnlyDirectories -> openFragment(ExampleGetMeFragment.ONLY_DIRECTORIES_GETME)
             R.id.getMeSingleSelection -> openFragment(ExampleGetMeFragment.SINGLE_SELECTION_GETME)
             R.id.getMeFromPath -> openFragment(ExampleGetMeFragment.FROM_PATH_GETME)
+            R.id.getMeMaximumSelectionSize -> openFragment(ExampleGetMeFragment.MAX_SELECTION_SIZE_GETME)
+            R.id.getMeAdapterAnimation -> openFragment(ExampleGetMeFragment.ADAPTER_ANIMATION_GETME)
+            R.id.getMeOverScroll -> openFragment(ExampleGetMeFragment.OVERSCROLL_GETME)
             R.id.getMeFromActivity -> {
                 startActivity(Intent(this.context, ExampleGetMeActivity::class.java))
             }
@@ -54,9 +60,7 @@ class StartFragment : Fragment(), View.OnClickListener {
         fragmentManager?.beginTransaction()
             ?.replace(
                 R.id.fragmentContainer,
-                ExampleGetMeFragment.newInstance(Bundle().apply {
-                    putInt("TYPE", type)
-                })
+                ExampleGetMeFragment.newInstance(type)
             )
             ?.addToBackStack(null)
             ?.commit()

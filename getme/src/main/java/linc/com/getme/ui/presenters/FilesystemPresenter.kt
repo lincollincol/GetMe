@@ -50,6 +50,7 @@ internal class FilesystemPresenter(
             selectionState,
             getMeInterfaceSettings.selectionMaxSize
         )
+        view?.enableOverScroll(getMeInterfaceSettings.enableOverScroll)
     }
 
     fun getFilesystemEntities() {
