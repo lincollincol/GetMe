@@ -170,6 +170,11 @@ You can also use my SelectionActionMode call back from here <a href="https://git
   <img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/RotateGetMe.png" width="450" height="200">
 </p>
 
+## What about using GetMe inside fragment? See example app <a href="https://github.com/lincollincol/GetMe/tree/master/app/src/main/java/linc/com/getmeexample">here</a> 
+
+## Documentation
+### GetMe constructor parameters
+
 
 ## License
 ```
