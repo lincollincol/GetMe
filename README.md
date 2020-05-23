@@ -42,7 +42,7 @@ dependencies {
 
 ## How to implement GetMe . . . ?
 
-### Use GetMe in the Activity as a fragment in the container
+### Use GetMe in the Activity as a fragment in the container. Full implementation code <a href="https://github.com/lincollincol/GetMe/blob/master/app/src/main/java/linc/com/getmeexample/ExampleGetMeActivity.kt">here in the example app</a>
 * Create container for fragmens(FrameLayou etc.) in your xml
 * Create Activity and implement interfaces:
 ``` kotlin
@@ -160,8 +160,8 @@ You can also use my SelectionActionMode call back from here <a href="https://git
     }
 ```
 
-#### And that's all. Accept my congratulations - you implement default GetMe in your application. Now build and run your app. 
-#### Full implementation code <a href="https://github.com/lincollincol/GetMe/blob/master/app/src/main/java/linc/com/getmeexample/ExampleGetMeActivity.kt">here in the example app</a>
+#### And that's all. Accept my congratulations - you implement default GetMe in your application. Now build and run your app.  
+
 #### Result app from implementation above
 <p align="center">
 <img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeMainMenu.png" width="200" height="450">&#10240 &#10240 &#10240 &#10240<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/InnerMenuGetMe.png" width="200" height="450">&#10240 &#10240 &#10240 &#10240<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/SelectionGetMe.png" width="200" height="450">
@@ -174,7 +174,6 @@ You can also use my SelectionActionMode call back from here <a href="https://git
 The code inside your *parent fragment* will look the same as in *Activity*, **but** you need to replace onRestoreInstanceState() with
 ``` kotlin 
     // This method should be inside your parent fragment that use GetMe
-    
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         if(savedInstanceState != null)
@@ -184,7 +183,6 @@ The code inside your *parent fragment* will look the same as in *Activity*, **bu
 And save parent fragment state inside activity
 ``` kotlin
     // This methods should be inside your Activity
-    
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         supportFragmentManager.beginTransaction()
@@ -302,12 +300,12 @@ class GetMeInterfaceSettings(
 * ***SelectionMaxSize (GetMeInterfaceSettings param)*** - numeric value which set limit for ```SelectionTracker```.  
 For example if you pass 10 as a selectionMaxSize in the parameters, GetMe will limit selection size and you can selet only 10 items. 
 <p align="center">
-<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeMaxSelectionSize.gif" width="250" height="450">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeMaxSelectionSize.gif" width="220" height="450">
 </p>  
 
 * ***EnableOverScroll (GetMeInterfaceSettings param)*** - boolean value which set *OverScroll* animation if you pass ```true``` as a enableOverScroll parameter.  
 <p align="center">
-<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeOverscrollAnimation.gif" width="250" height="450">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeOverscrollAnimation.gif" width="220" height="450">
 </p>  
 
 * ***AdapterAnimation (GetMeInterfaceSettings param)*** - recycler view adapter animations. See more about recycler view animations <a href="https://github.com/wasabeef/recyclerview-animators">here</a>.  
@@ -321,10 +319,11 @@ ANIMATION_ADAPTER_SLIDE_IN_LEFT
 ANIMATION_ADAPTER_SLIDE_IN_RIGHT
 ```
 <p align="center">
-<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeAdapterAnimations.gif" width="250" height="450">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeAdapterAnimations.gif" width="220" height="450">
 </p>  
 
 * ***AnimationFirstOnly (GetMeInterfaceSettings param)*** - play recycler view adapter animation only one time when you pass ```true``` as a parameter.  
+
 **[!WARNING] AnimationFirstOnly using only with AdapterAnimation parameter**
 
 * ***ActionType (GetMeInterfaceSettings param)*** - internal variable. **Skip this parameter**.
@@ -352,6 +351,70 @@ ANIMATION_ADAPTER_SLIDE_IN_RIGHT
 **[!WARNING] If you want to use SelectionTrackerCallback, make sure that you implement this Google library for selection  
 ```implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc01"```**
 
+* **OkView (GetMe param)** - view (Button, ImageView, . . .) which will call onFilesSelected() from FileManagerCompleteCallback to return result files into your ```Activity``` or ```Fragment```. Look at screen or downlaod app, you can see **left** blue FloationActionButton with back arrow - this is **okView**.
+
+* **BackView (GetMe param)** - view (Button, ImageView, . . .) which navigate you to previous directory and call onCloseFileManager() from CloseFileManagerCallback to close GetMe and let you implement custom logic inside onCloseFileManager(). Look at screen or downlaod app, you can see **right** blue FloationActionButton with down arrow - this is **backView**.
+
+* **FirstClearSelectionAfterBack (GetMe param)** - boolean value which set back view click type: if you pass ```true``` as a firstClearSelectionAfterBack parameter and you are using selection, back button first clear selection and then, after second click, navigate you to previous directory.  
+
+**[!WARNING] FirstClearSelectionAfterBack using only with backView**
+
+* **Style (GetMe param)**  - custom style reference which will be applied inside GetMe. If you want to override GetMe style, you should create new ```<style>``` in the ```styles.xml``` and add items with GetMe attributes names:
+``` xml
+    <style name="MyCustomGetMeTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="color_background_default_get_me"><my_color></item>
+        <item name="color_background_selected_get_me"><my_color></item>
+        <item name="color_background_ripple_get_me"><my_color></item>
+        <item name="color_background_circle_get_me"><my_color></item>
+        <item name="color_background_icon_get_me"><my_color></item>
+        <item name="color_background_selection_check_icon_get_me"><my_color></item>
+        <item name="color_background_selection_icon_get_me"><my_color>/item>
+        <item name="color_background_empty_directory_icon_get_me"><my_color></item>
+        <item name="color_text_empty_directory_get_me"><my_color></item>
+        <item name="color_text_get_me"><my_color></item>
+        <item name="size_text_empty_directory"><my_size></item>
+        <item name="string_empty_directory_get_me"><my_string></item>
+    </style>
+```
+
+**<a href="https://github.com/lincollincol/GetMe/tree/master/screenshots">See full screenshot with attributes name here</a>**
+
+<p align="center">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/CustomStyleGetMe.png" width="200" height="450">&#10240 &#10240 &#10240 &#10240<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/StyleNames.png" width="200" height="450">&#10240 &#10240 &#10240 &#10240<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeEmptyDirectory.png" width="200" height="450">
+</p>  
+
+* **FileLayout (GetMe param)** - custom layout reference which will be applied inside GetMe. If you want to override GetMe layout, you should create new ```item_my_castom_get_me_name.xml``` and add view's with the same types and id's. If you don't need some view, you can not add it to the markup.  
+
+**Custom layout from the screenshot below <a href="https://github.com/lincollincol/GetMe/blob/master/app/src/main/res/layout/item_get_me_custom.xml">here in the example app res/layout</a>**  
+**Default GetMe <a href="https://github.com/lincollincol/GetMe/blob/master/getme/src/main/res/layout/item_filesystem_entity_get_me.xml">item markup here</a>**  
+
+**[!WARNING] If you try to use view's with different types (Example: LinearLayout instead of ConstraintLayout), you will get ClassCastException. Be careful with it**
+
+**<a href="https://github.com/lincollincol/GetMe/blob/master/screenshots/LayoutIds.png">See full screenshots with view's id's here</a>**
+
+<p align="center">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/CustomLayoutGetMe.png" width="200" height="450">&#10240 &#10240 &#10240 &#10240<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/LayoutIds.png" width="200" height="450">
+</p>
+
+### GetMe methods <a href="https://github.com/lincollincol/GetMe/blob/master/getme/src/main/java/linc/com/getme/GetMe.kt">from GetMe library source</a>
+* **show()** - create internal GetMeFragment and launch it inside container (parameter value).  
+* **close()** - clear references and pop GetMeFragment from back stack.  
+* **performOkClick()** - performs ok click for calling onFilesSelected() from FileManagerCompleteCallback to get result files without creating okView. You can call this method inside your custom app click listeners etc.  
+* **performBackClick()** - performs back click for navigating directory or calling onCloseFileManager from CloseFileManagerCallback if current state equals to root. This method also used in cases when you don't need to create any back buttons. 
+* **isRoot()** - return true or false value. Check if current state equals to root.  
+* **getCurrentPath()** - return current path as a string. For example "/storage/emulated/0/Music". You can use it to implement displaying current path state or something like this.
+* **onBackPressed()** - handle back button clicks.  
+* **onSaveInstanceState()** - save current GetMe state.  
+* **onRestoreInstanceState()** - restore last saved GetMe state.  
+
+## Download example app (.apk)
+<a href="https://github.com/lincollincol/GetMe/blob/master/screenshots/app-debug.apk">Here you can download example app app-debug.apk and test GetMe</a>
+
+## Feedback
+<a href="http://mail.google.com/">linc.apps.sup@gmail.com</a>
+
+## Third part libraries
+<a href="https://github.com/wasabeef/recyclerview-animators">Recycler view animations</a>
 
 ## License
 ```
