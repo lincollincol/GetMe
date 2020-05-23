@@ -224,8 +224,7 @@ And call it from Activity
 And that's all. Now you know how to implement GetMe inside fragment as a subfragment. If something went wrong, you can see <a href="https://github.com/lincollincol/GetMe/tree/master/app/src/main/java/linc/com/getmeexample">example app code here</a>
 
 ## Documentation
-### GetMe constructor parameters
-From GetMe library source
+### GetMe constructor parameters <a href="https://github.com/lincollincol/GetMe/blob/master/getme/src/main/java/linc/com/getme/GetMe.kt">from GetMe library source</a>
 ``` kotlin
 class GetMe (
     private var fragmentManager: FragmentManager?,
@@ -244,11 +243,11 @@ class GetMe (
 // Implementation
 . . .
 ```
-* **FragmentManager** - supportFragmentManager from Activtiy, fragmentManager or childFragmentManager from Fragment. This parameter help GetMe start internal fragment inside fragment container.  
+* **FragmentManager (GetMe param)** - supportFragmentManager from Activtiy, fragmentManager or childFragmentManager from Fragment. This parameter help GetMe start internal fragment inside fragment container.  
 
 * **FragmentContainer** - container (FrameLayout or other ViewGroup) id from xml. GetMe will be launched inside this container.
 
-* **GetMeFilesystemSettings** - settings class that provide filter functions and start from path function.
+* **GetMeFilesystemSettings (GetMe param) <a href="https://github.com/lincollincol/GetMe/blob/master/getme/src/main/java/linc/com/getme/domain/entities/GetMeFilesystemSettings.kt">(GetMeFilesystemSettings source)</a>** - settings class that provide filter functions and start from path function.
 ``` kotlin
 class GetMeFilesystemSettings(
     internal val actionType: Int,
@@ -260,6 +259,99 @@ class GetMeFilesystemSettings(
 // Implementation
 . . .
 ```
+* ***ActionType (GetMeFilesystemSettings param)*** - constant, that note which content will be selected during the GetMe lifecycle:
+
+```ACTION_SELECT_DIRECTORY``` - select directory (will display all directories **without** files)  
+```ACTION_SELECT_FILE``` - select files (will display files and directories)
+
+* ***MainContent (GetMeFilesystemSettings param)*** - list of file extensions (pdf, mp3, . . .) which will be available during GetMe lifecycle. GetMe will filter unnecessary files and display all files with extensions that you pass in the list.
+
+* ***ExceptContent (GetMeFilesystemSettings param)*** - list of file extensions (pdf, mp3, . . .) which will be excepted during GetMe lifecycle. GetMe will except files with extensions that you pass in the list and display other files.  
+
+**[!WARNING] When you try to use both MainContent and ExceptContent, GetMe will ignore ExceptContent, because MainContent have bigger priority**
+
+* ***Path (GetMeFilesystemSettings param)*** - path (string) to the **directory** and only **directory**, which GetMe will open at first. If you pass path to the **file**, GetMe throws ```GetMeInvalidPathException```.
+
+* ***AllowBackPath (GetMeFilesystemSettings param)*** - boolean (true/false) value, which is responsible for creating back path (path to root).  
+**--** For example you pass ```"/storage/emulated/0/MyFiles/Music"``` **path** and pass ```true``` as an **allowBackPath**. GetMe will be launched from ```"/storage/emulated/0/MyFiles/Music"``` path and add previous directories into stack. When you click **back** button, GetMe you navigate to previous directory from the initial path:  
+```"/storage/emulated/0/MyFiles/Music"``` ==> ```"/storage/emulated/0/MyFiles"```.  
+**--** If you pass ```false``` as an **allowBackPath**, GetMe will use ```"/storage/emulated/0/MyFiles/Music"``` **path** as a **root** and when you click **back** button, GetMe will be closed.  
+
+**[!WARNING] AllowBackPath using only with Path parameter**
+
+* **GetMeInterfaceSettings <a href="https://github.com/lincollincol/GetMe/blob/master/getme/src/main/java/linc/com/getme/ui/GetMeInterfaceSettings.kt">(GetMeInterfaceSettings source)</a>**
+``` kotlin
+class GetMeInterfaceSettings(
+    internal val selectionType: Int = SELECTION_SINGLE,
+    internal val selectionMaxSize: Int = SELECTION_SIZE_DEFAULT,
+    internal val enableOverScroll: Boolean = false,
+    internal var adapterAnimation: Int = ANIMATION_ADAPTER_DISABLE,
+    internal var animationFirstOnly: Boolean = true,
+    internal var actionType: Int = 0
+) : Parcelable {
+// Implementation
+. . .
+```
+* ***SelectionType (GetMeInterfaceSettings param)*** - constant, that note which selection type GetMe will use:  
+```SELECTION_SINGLE``` - selection without ```SelectionTracker```. Use this selection when you need to select only one file or directory.  
+**--** If you want to select file, you should click on it and handle result in the onFilesSelected() callback method.  
+**--** If you want to select directory, you should use okView: open directory and click on okView. Handle result in the onFilesSelected() callback method. okView, in this case, can compare with *"Open this directory"* expression.  
+```SELECTION_MULTIPLE``` - selection with ```SelectionTracker```. Use this selection when you need to select **multiple** items (files or directories). You **must** use ```okView``` with this selection type, because when you select few items you need to call onFilesSelected() to handle result files.  
+```SELECTION_MIXED``` - selection with ```SelectionTracker```. Use this selection when you need to select **multiple** items (files or directories) and **single** item. This selection type is ```SINGLE``` and ```MULTIPLE``` in one type. You can select one file by click and you can use ```SelectionTracker``` with ```okView``` to select multiple items. 
+
+* ***SelectionMaxSize (GetMeInterfaceSettings param)*** - numeric value which set limit for ```SelectionTracker```.  
+For example if you pass 10 as a selectionMaxSize in the parameters, GetMe will limit selection size and you can selet only 10 items. 
+<p align="center">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeMaxSelectionSize.gif" width="250" height="450">
+</p>  
+
+* ***EnableOverScroll (GetMeInterfaceSettings param)*** - boolean value which set *OverScroll* animation if you pass ```true``` as a enableOverScroll parameter.  
+<p align="center">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeOverscrollAnimation.gif" width="250" height="450">
+</p>  
+
+* ***AdapterAnimation (GetMeInterfaceSettings param)*** - recycler view adapter animations. See more about recycler view animations <a href="https://github.com/wasabeef/recyclerview-animators">here</a>.  
+Available animations in the GetMe:
+```
+ANIMATION_ADAPTER_DISABLE
+ANIMATION_ADAPTER_FADE_IN
+ANIMATION_ADAPTER_SCALE_IN
+ANIMATION_ADAPTER_SCALE_IN_BOTTOM
+ANIMATION_ADAPTER_SLIDE_IN_LEFT
+ANIMATION_ADAPTER_SLIDE_IN_RIGHT
+```
+<p align="center">
+<img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/GetMeAdapterAnimations.gif" width="250" height="450">
+</p>  
+
+* ***AnimationFirstOnly (GetMeInterfaceSettings param)*** - play recycler view adapter animation only one time when you pass ```true``` as a parameter.  
+**[!WARNING] AnimationFirstOnly using only with AdapterAnimation parameter**
+
+* ***ActionType (GetMeInterfaceSettings param)*** - internal variable. **Skip this parameter**.
+
+* **CloseFileManagerCallback (GetMe param)** - This callback have ```onCloseFileManager()``` method that will be **called** when you **try close GetMe with back button**. Use this method to implement back pressed logic inside your activity or fragment instead of ```onBackPressed()```. This callback must implement ```Activity``` or ```Fragment``` that use GetMe.
+``` kotlin
+    interface CloseFileManagerCallback {
+        fun onCloseFileManager()
+    }
+```
+
+* **FileManagerCompleteCallback (GetMe param)** - This callback have ```onFilesSelected()``` method will be called when you click on **okView** or when you **click on file** (file clicks available only with selection types ```SELECTION_SINGLE``` or ```SELECTION_MIXED```). Use this callback in your activity or fragment for handle result files. This callback must implement ```Activity``` or ```Fragment``` that use GetMe.
+``` kotlin
+    interface FileManagerCompleteCallback {
+        fun onFilesSelected(selectedFiles: List<File>)
+    }
+```
+
+* **SelectionTrackerCallback (GetMe param)** - This callback return ```SelectionTracker``` instance if you use ```SELECTION_MULTIPLE``` or ```SELECTION_MIXED``` selection types. Use this callback in your activity or fragment for more flexible work with selection: clear, selecd, deselect etc. This is optional callback, you shouldn't implement it.
+``` kotlin
+    interface SelectionTrackerCallback {
+        fun onSelectionTrackerCreated(selectionTracker: SelectionTracker<FilesystemEntityModel>)
+    }
+```
+**[!WARNING] If you want to use SelectionTrackerCallback, make sure that you implement this Google library for selection  
+```implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc01"```**
+
 
 ## License
 ```
