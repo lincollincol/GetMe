@@ -170,11 +170,96 @@ You can also use my SelectionActionMode call back from here <a href="https://git
   <img src="https://github.com/lincollincol/GetMe/blob/master/screenshots/RotateGetMe.png" width="450" height="200">
 </p>
 
-## What about using GetMe inside fragment? See example app <a href="https://github.com/lincollincol/GetMe/tree/master/app/src/main/java/linc/com/getmeexample">here</a> 
+## What about using GetMe inside fragment as a subfragment? See example app <a href="https://github.com/lincollincol/GetMe/tree/master/app/src/main/java/linc/com/getmeexample">here</a> 
+The code inside your *parent fragment* will look the same as in *Activity*, **but** you need to replace onRestoreInstanceState() with
+``` kotlin 
+    // This method should be inside your parent fragment that use GetMe
+    
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if(savedInstanceState != null)
+            getMe.onRestoreInstanceState(savedInstanceState)
+    }
+```
+And save parent fragment state inside activity
+``` kotlin
+    // This methods should be inside your Activity
+    
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, supportFragmentManager.getFragment(savedInstanceState, "FRA")!!)
+            .commit()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        supportFragmentManager.putFragment(
+            outState,
+            "FRA",
+            supportFragmentManager.findFragmentById(R.id.fragmentContainer)!!
+        )
+        super.onSaveInstanceState(outState)
+    }
+```
+So, now let's handle back clicks. Fragments don't have OnBackPressed, so we should create custom callback which will be called from Activity onBackPressed.
+``` kotlin
+    interface FileManagerFragment {
+        fun onBackPressed()
+    }
+```
+Implement this callback in the parent GetMe fragment
+``` kotlin
+    override fun onBackPressed() { // FileManagerFragment implementation inside GetMe parent fragment
+        getMe.onBackPressed()
+    }
+```
+And call it from Activity
+``` kotlin
+    override fun onBackPressed() { // Base onBackPressed method implementation inside Activity 
+        val fragment = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
+        if(fragment != null && fragment is FileManagerFragment)
+            fragment.onBackPressed() // Call onBackPressed() from FileManagerFragment callback
+    }
+```
+And that's all. Now you know how to implement GetMe inside fragment as a subfragment. If something went wrong, you can see <a href="https://github.com/lincollincol/GetMe/tree/master/app/src/main/java/linc/com/getmeexample">example app code here</a>
 
 ## Documentation
 ### GetMe constructor parameters
+From GetMe library source
+``` kotlin
+class GetMe (
+    private var fragmentManager: FragmentManager?,
+    private var fragmentContainer: Int?,
+    private var getMeFilesystemSettings: GetMeFilesystemSettings?,
+    private var getMeInterfaceSettings: GetMeInterfaceSettings?,
+    private var closeFileManagerCallback: CloseFileManagerCallback?,
+    private var fileManagerCompleteCallback: FileManagerCompleteCallback?,
+    private var selectionTrackerCallback: SelectionTrackerCallback? = null,
+    private var okView: View? = null,
+    private var backView: View? = null,
+    private var firstClearSelectionAfterBack: Boolean = false,
+    @StyleRes private var style: Int = GET_ME_DEFAULT_STYLE,
+    @LayoutRes private var fileLayout: Int = GET_ME_DEFAULT_FILE_LAYOUT
+) {
+// Implementation
+. . .
+```
+* **FragmentManager** - supportFragmentManager from Activtiy, fragmentManager or childFragmentManager from Fragment. This parameter help GetMe start internal fragment inside fragment container.  
 
+* **FragmentContainer** - container (FrameLayout or other ViewGroup) id from xml. GetMe will be launched inside this container.
+
+* **GetMeFilesystemSettings** - settings class that provide filter functions and start from path function.
+``` kotlin
+class GetMeFilesystemSettings(
+    internal val actionType: Int,
+    internal val mainContent: MutableList<String>? = null,
+    internal val exceptContent: MutableList<String>? = null,
+    internal val path: String? = null,
+    internal val allowBackPath: Boolean = false
+) : Parcelable {
+// Implementation
+. . .
+```
 
 ## License
 ```
