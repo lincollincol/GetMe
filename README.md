@@ -42,6 +42,24 @@ dependencies {
 
 ## How to implement GetMe . . . ?
 
+Add permissions to the Manifest.xml
+``` xml
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+```
+
+Grant permissions with <a href="https://github.com/Karumi/Dexter">Dexter</a> or code below:  
+``` kotlin
+ActivityCompat.requestPermissions(
+    this, 
+    arrayOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ), 
+    REQUEST_CODE
+)
+```
+
 ### Use GetMe in the Activity as a fragment in the container. Full implementation code <a href="https://github.com/lincollincol/GetMe/blob/master/app/src/main/java/linc/com/getmeexample/ExampleGetMeActivity.kt">here in the example app</a>
 * Create container for fragmens(FrameLayou etc.) in your xml
 * Create Activity and implement interfaces:
