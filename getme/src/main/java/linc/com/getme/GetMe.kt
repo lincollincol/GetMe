@@ -73,7 +73,7 @@ class GetMe (
     /**
      * Remove GetMe from back stack and clear references
      * */
-    fun close(callback: () -> Unit) {
+    fun close(callback: () -> Int) {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             fragmentManager!!.popBackStack()

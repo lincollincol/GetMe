@@ -1,18 +1,17 @@
 package linc.com.getmeexample
 
 import android.Manifest
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import linc.com.getme.GetMe
-import linc.com.getmeexample.fragments.ExampleGetMeFragment
 import linc.com.getmeexample.fragments.FileManagerFragment
 import linc.com.getmeexample.fragments.StartFragment
+
 
 class MainActivity : AppCompatActivity() {
 
