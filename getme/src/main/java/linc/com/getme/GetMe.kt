@@ -13,6 +13,7 @@ import linc.com.getme.ui.callbacks.CloseFileManagerCallback
 import linc.com.getme.ui.callbacks.FileManagerCompleteCallback
 import linc.com.getme.ui.callbacks.SelectionTrackerCallback
 import linc.com.getme.ui.fragments.GetMeFragment
+import linc.com.getme.utils.CloseParameterCallback
 import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_FILE_LAYOUT
 import linc.com.getme.utils.Constants.Companion.GET_ME_DEFAULT_STYLE
 import linc.com.getme.utils.Constants.Companion.KEY_FILESYSTEM_SETTINGS
@@ -73,7 +74,7 @@ class GetMe (
     /**
      * Remove GetMe from back stack and clear references
      * */
-    fun close(callback: () -> Int) {
+    fun close(callback: CloseParameterCallback) {
         val getMeFragment = fragmentManager?.findFragmentByTag(TAG_GET_ME)
         if(getMeFragment != null) {
             fragmentManager!!.popBackStack()
@@ -89,7 +90,7 @@ class GetMe (
         okView = null
         backView = null
 
-        callback()
+        callback.close();
     }
 
     /**
